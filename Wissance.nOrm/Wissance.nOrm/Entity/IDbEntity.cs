@@ -8,54 +8,66 @@ namespace Wissance.nOrm.Entity
     ///            it forms an SQL like UPDATE @GetTableSchema().@GetTableName() SET (col1=val1, col2=val2, ...)
     ///         3. GetSelectManyQuery returns Query to SELECT a multiple items based on WHERE clauses,
     ///            it forms an SQL like SELECT (col1, col2, ...) FROM @GetTableSchema().@GetTableName() WHERE (col1=...)
+    ///         4. GetSelectOneQuery returns Query to SELECT a single item based in WHERE clauses,
+    ///            it forms an SQL like SELECT (col1, col2, ...) FROM @GetTableSchema().@GetTableName() WHERE (col1=...)
+    ///      Entity is a class that related with table.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Comparable type, Key</typeparam>
     public interface IDbEntity<T>
     where T:IComparable
     {
         /// <summary>
-        /// 
+        ///     Returns Table Schema i.e. for postgres public
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns TableSchema i.e. for postgres public</returns>
         string GetTableSchema();
+        
         /// <summary>
-        /// 
+        ///    Returns Table Name
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns Table Name</returns>
         string GetTableName();
+        
         /// <summary>
-        /// 
+        ///    Returns ModelType as a string, probably we could replace it with $"{GetTableSchema()}.{GetTableName()}"
         /// </summary>
         /// <returns></returns>
         string GetModelType();
+        
         /// <summary>
-        /// 
+        ///    Returns Identifier of Entity
         /// </summary>
         /// <returns></returns>
         T GetId();
+        
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         string GetCreateSqlQuery();
+        
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         string GetUpdateSqlQuery();
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columns"></param>
         /// <param name="whereClause"></param>
         /// <returns></returns>
+        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
         string GetSelectManyQuery(IList<string> columns, IDictionary<string, object> whereClause);
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="columns"></param>
         /// <param name="whereClause"></param>
         /// <returns></returns>
+        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
         string GetSelectOneQuery(IList<string> columns, IDictionary<string, object> whereClause);
     }
 }

@@ -1,7 +1,10 @@
-namespace Wissance.nOrm.Context;
+using Wissance.nOrm.Entity;
+
+namespace Wissance.nOrm.Repository
 {
-    public interface IDbRepository<T> : IDisposable 
-        where T: class, IDbEntity, new()
+    public interface IDbRepository<T, TId> : IDisposable 
+        where T: class, IDbEntity<TId>, new()
+        where TId: IComparable
     {
         public Task<IList<T>> GetManyAsync(IDictionary<string, object> whereClause, int? page, int? size);
         public Task<T> GetOneAsync(IDictionary<string, object> whereClause);
