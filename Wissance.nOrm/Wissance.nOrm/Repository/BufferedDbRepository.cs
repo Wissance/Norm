@@ -2,10 +2,14 @@ using Wissance.nOrm.Entity;
 
 namespace Wissance.nOrm.Repository
 {
-    public class BufferedDbRepository<T, TId> : IDbRepository<T, TId>
-        where T : class, IDbEntity<TId>, new()
+    /*public class BufferedDbRepository<TE> : IDbRepository<TE>
+        where TE : class, IDbEntityQueryBuilder<TE>, new()
         where TId : IComparable
     {
+        public BufferedDbRepository()
+        {
+        }
+
         public void Dispose()
         {
             throw new NotImplementedException();
@@ -45,5 +49,5 @@ namespace Wissance.nOrm.Repository
         {
             throw new NotImplementedException();
         }
-    }
+    }*/
 }
