@@ -38,7 +38,7 @@ namespace Wissance.nOrm.Entity
         /// 
         /// </summary>
         /// <returns></returns>
-        string BuildCreateSqlQuery(TE entity);
+        string BuildInsertSqlQuery(TE entity);
         
         /// <summary>
         /// 

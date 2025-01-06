@@ -1,13 +1,15 @@
+using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Entity;
 
 namespace Wissance.nOrm.Repository
 {
-    /*public class BufferedDbRepository<TE> : IDbRepository<TE>
-        where TE : class, IDbEntityQueryBuilder<TE>, new()
-        where TId : IComparable
+    public class BufferedDbRepository<T> : IDbRepository<T>
+        where T: class, new()
     {
-        public BufferedDbRepository()
+        public BufferedDbRepository(IDbEntityQueryBuilder<T> builder, ILoggerFactory loggerFactory)
         {
+            _builder = builder;
+            _logger = loggerFactory.CreateLogger<BufferedDbRepository<T>>();
         }
 
         public void Dispose()
@@ -49,5 +51,8 @@ namespace Wissance.nOrm.Repository
         {
             throw new NotImplementedException();
         }
-    }*/
+
+        private readonly IDbEntityQueryBuilder<T> _builder;
+        private readonly ILogger<BufferedDbRepository<T>> _logger;
+    }
 }
