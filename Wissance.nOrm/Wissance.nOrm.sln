@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm", "Wissance.nOrm\Wissance.nOrm.csproj", "{5D0473FC-F97A-45BA-922F-07EE2C1CF846}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.Tests", "Wissance.nOrm.Tests\Wissance.nOrm.Tests.csproj", "{91D8D2B1-A953-47CE-BF33-59D9438B49BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.MySql.Tests", "Wissance.nOrm.MySql.Tests\Wissance.nOrm.MySql.Tests.csproj", "{91D8D2B1-A953-47CE-BF33-59D9438B49BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

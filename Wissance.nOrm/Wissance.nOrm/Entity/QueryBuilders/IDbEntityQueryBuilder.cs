@@ -1,4 +1,4 @@
-namespace Wissance.nOrm.Entity
+namespace Wissance.nOrm.Entity.QueryBuilders
 {
     /// <summary>
     ///     IDbEntityQueryBuilder is a interface that helps to build queries to perform following operation:
@@ -28,11 +28,11 @@ namespace Wissance.nOrm.Entity
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="columns"></param>
         /// <param name="whereClause"></param>
+        /// <param name="columns"></param>\
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildSelectOneQuery(IList<string> columns, IDictionary<string, object> whereClause);
+        string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null);
 
         /// <summary>
         /// 
