@@ -43,7 +43,7 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
+                    sql = _sqlBuilder.BuildSelectManyQuery(page, size, whereClause, columns);
                     // 2. Create Command from Adapter
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
                     {
