@@ -32,42 +32,63 @@ namespace Wissance.nOrm.Repository
             _cancellationSource.Cancel();
         }
 
-        public Task<IList<T>> GetManyAsync(IDictionary<string, object> whereClause, int? page, int? size)
+        public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
         {
-            throw new NotImplementedException();
+            string sql = "";
+            try
+            {
+                return null;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during getting List of objects of type \"{typeof(T)}\" with SQL query: \"{sql}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return null;
+            }
         }
 
         public async Task<T> GetOneAsync(IDictionary<string, object> whereClause = null, IList<string> columns = null)
         {
-            T item = null;
-            // 1. Create Connection from Adapter
-            using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+            string sql = "";
+            try
             {
-                await conn.OpenAsync(_cancellationSource.Token);
-                string sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
-                // 2. Create Command from Adapter
-                using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
+                T item = null;
+                // 1. Create Connection from Adapter
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
-                    // 3. Execute Db Reader && read
-                    DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
-                    // 4. Construct item from a fieldset using a Factory method
-                    while (await reader.ReadAsync())
+                    await conn.OpenAsync(_cancellationSource.Token);
+                    sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
+                    // 2. Create Command from Adapter
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
                     {
-                        object[] tableColumns = new object[reader.FieldCount];
-                        reader.GetValues(tableColumns);
-                        item = _entityFactoryFunc(tableColumns);
-                        if (item == null)
+                        // 3. Execute Db Reader && read
+                        DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
+                        // 4. Construct item from a fieldset using a Factory method
+                        while (await reader.ReadAsync())
                         {
-                            _logger.LogWarning(string.Format("Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly",
-                                typeof(T)));
+                            object[] tableColumns = new object[reader.FieldCount];
+                            reader.GetValues(tableColumns);
+                            item = _entityFactoryFunc(tableColumns);
+                            if (item == null)
+                            {
+                                _logger.LogWarning(string.Format(
+                                    "Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly",
+                                    typeof(T)));
+                            }
                         }
+
+                        await conn.CloseAsync();
                     }
-
-                    await conn.CloseAsync();
                 }
-            }
 
-            return item;
+                return item;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during getting object of type \"{typeof(T)}\" with SQL query: \"{sql}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return null;
+            }
         }
 
         public async Task<bool> InsertAsync(T item, bool immediately)
