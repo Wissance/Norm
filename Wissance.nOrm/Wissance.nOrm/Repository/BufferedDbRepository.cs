@@ -37,7 +37,40 @@ namespace Wissance.nOrm.Repository
             string sql = "";
             try
             {
-                return null;
+                T item = new T();
+                IList<T> items = new List<T>();
+                // 1. Create Connection from Adapter
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+                {
+                    await conn.OpenAsync(_cancellationSource.Token);
+                    sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
+                    // 2. Create Command from Adapter
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
+                    {
+                        // 3. Execute Db Reader && read
+                        DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
+                        // 4. Construct item from a fieldset using a Factory method
+                        while (await reader.ReadAsync())
+                        {
+                            object[] tableColumns = new object[reader.FieldCount];
+                            reader.GetValues(tableColumns);
+                            T obj = _entityFactoryFunc(tableColumns);
+                            if (obj != null)
+                            {
+                                items.Add(item);
+                            }
+                            else
+                            {
+                                _logger.LogWarning(string.Format( "Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly", 
+                                    typeof(T)));
+                            }
+                        }
+                    }
+                    
+                    await conn.CloseAsync();
+                }
+
+                return items;
             }
             catch (Exception e)
             {
@@ -71,8 +104,7 @@ namespace Wissance.nOrm.Repository
                             item = _entityFactoryFunc(tableColumns);
                             if (item == null)
                             {
-                                _logger.LogWarning(string.Format(
-                                    "Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly",
+                                _logger.LogWarning(string.Format( "Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly",
                                     typeof(T)));
                             }
                         }
