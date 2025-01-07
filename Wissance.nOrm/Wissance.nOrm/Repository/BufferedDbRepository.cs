@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
@@ -30,6 +31,8 @@ namespace Wissance.nOrm.Repository
         public void Dispose()
         {
             _cancellationSource.Cancel();
+            _createSync.Dispose();
+            _updateSync.Dispose();
         }
 
         public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
@@ -125,7 +128,28 @@ namespace Wissance.nOrm.Repository
 
         public async Task<bool> InsertAsync(T item, bool immediately)
         {
-            throw new NotImplementedException();
+            string insertQuery = string.Empty;
+            try
+            {
+                if (immediately)
+                {
+                    insertQuery = _sqlBuilder.BuildInsertSqlQuery(item);
+                    int result = await UpsertImpl(insertQuery);
+                    return result > 0;
+                }
+                
+                await _createSync.WaitAsync(_cancellationSource.Token);
+                int key = _itemsToCreate.Keys.Any() ? _itemsToCreate.Keys.Last() + 1 : 1;
+                _itemsToCreate[key] = new List<T>() { item };
+                _createSync.Release();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during insert object of type \"{typeof(T)}\" with SQL query: \"{insertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return false;
+            }
         }
 
         public async Task<int> BulkInsertAsync(IList<T> items, bool immediately)
@@ -147,12 +171,59 @@ namespace Wissance.nOrm.Repository
         {
             throw new NotImplementedException();
         }
+        
+        private async Task<int> UpsertImpl(string upsertQuery)
+        {
+            int result = 0;
+            try
+            {
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+                {
+                    DbTransaction transaction = null;
+                    try
+                    {
+                        await conn.OpenAsync(_cancellationSource.Token);
+                        transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
+
+                        using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(upsertQuery, conn))
+                        {
+                            result = await cmd.ExecuteNonQueryAsync();
+                        }
+
+                        await transaction.CommitAsync(_cancellationSource.Token);
+                        await conn.CloseAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertQuery}\", error: ${e.Message}");
+                        _logger.LogDebug(e.ToString());
+                        result = -1;
+                        if (transaction != null)
+                            await transaction.RollbackAsync(_cancellationSource.Token);
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return -2;
+            }
+        }
 
         private readonly string _connStr;
         private readonly DbAdapter _dbAdapter;
         private readonly IDbEntityQueryBuilder<T> _sqlBuilder;
         private readonly ILogger<BufferedDbRepository<T>> _logger;
         private readonly Func<object[], T> _entityFactoryFunc;
+        
         private readonly CancellationTokenSource _cancellationSource = new CancellationTokenSource();
+        private readonly SemaphoreSlim _createSync = new SemaphoreSlim (1);
+        private readonly SemaphoreSlim _updateSync = new SemaphoreSlim (1);
+        
+        private readonly IDictionary<int, IList<T>> _itemsToCreate = new ConcurrentDictionary<int, IList<T>>();
+        private readonly IDictionary<int, IList<T>> _itemsToUpdate = new ConcurrentDictionary<int, IList<T>>();
     }
 }
