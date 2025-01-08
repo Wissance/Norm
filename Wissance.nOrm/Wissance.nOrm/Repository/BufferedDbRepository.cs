@@ -1,9 +1,7 @@
 using System.Collections.Concurrent;
 using System.Data.Common;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
-using Wissance.nOrm.Database.Connection;
 using Wissance.nOrm.Entity.QueryBuilders;
 
 namespace Wissance.nOrm.Repository
