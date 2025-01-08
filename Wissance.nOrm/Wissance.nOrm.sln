@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm", "Wissance.n
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.MySql.Tests", "Wissance.nOrm.MySql.Tests\Wissance.nOrm.MySql.Tests.csproj", "{91D8D2B1-A953-47CE-BF33-59D9438B49BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.MySql", "Wissance.nOrm.MySql\Wissance.nOrm.MySql.csproj", "{0DA64389-7D6C-41C0-A50C-74C0D02D460C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.Postgres", "Wissance.nOrm.Postgres\Wissance.nOrm.Postgres.csproj", "{2FBF6909-9EC9-4318-9C7E-5026712434EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{91D8D2B1-A953-47CE-BF33-59D9438B49BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91D8D2B1-A953-47CE-BF33-59D9438B49BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91D8D2B1-A953-47CE-BF33-59D9438B49BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA64389-7D6C-41C0-A50C-74C0D02D460C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA64389-7D6C-41C0-A50C-74C0D02D460C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA64389-7D6C-41C0-A50C-74C0D02D460C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA64389-7D6C-41C0-A50C-74C0D02D460C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FBF6909-9EC9-4318-9C7E-5026712434EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FBF6909-9EC9-4318-9C7E-5026712434EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FBF6909-9EC9-4318-9C7E-5026712434EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FBF6909-9EC9-4318-9C7E-5026712434EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

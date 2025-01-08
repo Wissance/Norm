@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Wissance.nOrm\Wissance.nOrm.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MySql.Data" Version="9.1.0" />
+    </ItemGroup>
+
+</Project>
