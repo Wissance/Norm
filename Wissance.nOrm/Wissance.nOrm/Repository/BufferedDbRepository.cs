@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Data.Common;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
 using Wissance.nOrm.Database.Connection;
@@ -154,12 +155,61 @@ namespace Wissance.nOrm.Repository
 
         public async Task<int> BulkInsertAsync(IList<T> items, bool immediately)
         {
+            /*try
+            {
+                if (items == null || !items.Any())
+                    return 0;
+                if (immediately)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (T item in items)
+                    {
+                        sb.Append(item.GetCreateSqlQuery());
+                        sb.Append(" ");
+                    }
+
+                    int result = await UpsertImpl(sb.ToString());
+                    return result;
+                }
+
+                await _createSync.WaitAsync(_cancellationSource.Token);
+                int key = _itemsToCreate.Keys.Any() ? _itemsToCreate.Keys.Last() + 1 : 1;
+                _itemsToCreate[key] = items;
+                _createSync.Release();
+                return items.Count;
+            }
+            catch (Exception e)
+            {
+                //todo (umv): add logging
+                return -666;
+            }*/
             throw new NotImplementedException();
         }
 
         public async Task<bool> UpdateAsync(T item, bool immediately)
         {
-            throw new NotImplementedException();
+            string insertQuery = string.Empty;
+            try
+            {
+                if (immediately)
+                {
+                    insertQuery = _sqlBuilder.BuildUpdateSqlQuery(item);
+                    int result = await UpsertImpl(insertQuery);
+                    return result > 0;
+                }
+                
+                await _updateSync.WaitAsync(_cancellationSource.Token);
+                int key = _itemsToUpdate.Keys.Any() ? _itemsToUpdate.Keys.Last() + 1 : 1;
+                _itemsToUpdate[key] = new List<T>() { item };
+                _createSync.Release();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during update object of type \"{typeof(T)}\" with SQL query: \"{insertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return false;
+            }
         }
 
         public async Task<int> BulkUpdateAsync(IList<T> items, bool immediately)
