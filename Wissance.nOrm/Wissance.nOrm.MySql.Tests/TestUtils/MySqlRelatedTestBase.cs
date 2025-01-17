@@ -13,7 +13,7 @@ namespace Wissance.nOrm.Tests.TestUtils
         {
             IDbManager dbManager = DbManagerFactory.Create(DbEngine.MySql, new LoggerFactory());
 
-            string dbNameTemplate = "MinPay_Data_Tests_{0}";
+            string dbNameTemplate = "nORM_Test_DB_{0}";
             Guid dbId = Guid.NewGuid();
             string dbName = string.Format(dbNameTemplate, dbId.ToString().Replace("-", ""));
 

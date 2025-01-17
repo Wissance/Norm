@@ -6,12 +6,12 @@ namespace Wissance.nOrm.Tests.Repository
     {
         public TestMySqlBufferedRepository()
         {
-            
+            PrepareDbAndData(CreateScript, InsertDataScript);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            DestroyDb();
         }
         
         [Fact]
@@ -23,5 +23,8 @@ namespace Wissance.nOrm.Tests.Repository
         public async Task TestGetOneAsync()
         {
         }
+
+        private const string CreateScript = @"../../../TestData/test_db_structure.sql";
+        private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
     }
 }
