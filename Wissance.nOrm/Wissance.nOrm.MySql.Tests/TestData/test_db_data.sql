@@ -1,0 +1,15 @@
+INSERT INTO physical_values(id, name, designation, description) VALUES (1, 'Температура', 'T', 'Температура');
+INSERT INTO physical_values(id, name, designation, description) VALUES (2, 'Давление', 'P', 'Давление');
+INSERT INTO physical_values(id, name, designation, description) VALUES (3, 'Объем', 'V', 'Объем');
+INSERT INTO physical_values(id, name, designation, description) VALUES (4, 'Сила тока', 'I', 'Сила тока');
+INSERT INTO physical_values(id, name, designation, description) VALUES (5, 'Электрическое напряжение', 'U', 'Электрическое напряжение');
+INSERT INTO physical_values(id, name, designation, description) VALUES (6, 'Масса', 'm', 'Масса');
+INSERT INTO physical_values(id, name, designation, description) VALUES (7, 'Частота', 'f', 'Частота');
+INSERT INTO physical_values(id, name, designation, description) VALUES (8, 'Плотность', 'ρ', 'Плотность');
+INSERT INTO physical_values(id, name, designation, description) VALUES (9, 'Длина', 'L', 'Длина');
+INSERT INTO physical_values(id, name, designation, description) VALUES (10, 'Электрическое сопротивление', 'R', 'Электрическое сопротивление');
+INSERT INTO physical_values(id, name, designation, description) VALUES (11, 'Вязкость', 'υ', 'Вязкость');
+INSERT INTO physical_values(id, name, designation, description) VALUES (12, 'Теплоемкость', 'C', 'Теплоемкость');
+INSERT INTO physical_values(id, name, designation, description) VALUES (13, 'Время', 't', 'Время');
+INSERT INTO physical_values(id, name, designation, description) VALUES (14, 'Скорость', 'v', 'Скорость');
+INSERT INTO physical_values(id, name, designation, description) VALUES (15, 'Ускорение', 'a', 'Ускорение');

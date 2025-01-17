@@ -17,6 +17,7 @@ namespace Wissance.nOrm.Tests.Repository
         [Fact]
         public async Task TestGetManyAsync()
         {
+            
         }
         
         [Fact]
