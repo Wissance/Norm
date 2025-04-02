@@ -27,9 +27,9 @@ VALUES (5, 'ºC', 'ºC', 'Градус цельсия', (SELECT id FROM physical
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (6, 'В', 'В', 'Вольт', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'U'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (7, 'г/куб.см', 'г/см3', 'Грам/кубический сантиметр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'ρ'));
+VALUES (7, 'г/куб.см', 'г/см3', 'Грам на кубический сантиметр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'ρ'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (8, 'об/мин', 'об/мин', 'Оборотов/минуту', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'v'));
+VALUES (8, 'об/мин', 'об/мин', 'Оборотов в минуту', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'v'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (9, 'А', 'А', 'Ампер', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'I'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
@@ -39,11 +39,11 @@ VALUES (11, 'м', 'м', 'Метр', (SELECT id FROM physical_values AS pv WHERE 
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (12, 'мм', 'мм', 'Миллиметр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'L'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (13, 'т/сут', 'т/сут', 'Тонн/сутки', NULL);
+VALUES (13, 'т/сут', 'т/сут', 'Тонн в сутки', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (14, 'куб.м/сут', 'м3/сут', 'Кубических метров/сутки', NULL);
+VALUES (14, 'куб.м/сут', 'м3/сут', 'Кубических метров в сутки', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (15, 'млн. куб.м/сут', '', 'Миллионов кубических метров/сутки', NULL);
+VALUES (15, 'млн. куб.м/сут', '', 'Миллионов кубических метров в сутки', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (16, 'м/с2', 'м/с2', 'Метр/секунду в квадрате', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'a'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
@@ -55,11 +55,11 @@ VALUES (19, 'об', 'об', 'Оборот', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (20, 'мПа/с', 'мПа/с', 'Миллипаскаль в секунду', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (21, 'м3/(сут*МПа)', '', 'Кубичиских метров на мегапаскаль в сутки', NULL);
+VALUES (21, 'м3/(сут*МПа)', '', 'Кубических метров на мегапаскаль в сутки', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (22, '', '', 'Безразмерная величина', NULL);
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (23, 'кг/куб.м', 'кг/куб.м', 'Килограм/кубический метр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'ρ'));
+VALUES (23, 'кг/куб.м', 'кг/куб.м', 'Килограм на кубический метр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'ρ'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (24, 'Па*с', 'Па*с', 'Паскаль*секунда', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'υ'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)

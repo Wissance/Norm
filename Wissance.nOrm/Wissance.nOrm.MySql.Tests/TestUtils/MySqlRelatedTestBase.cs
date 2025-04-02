@@ -43,7 +43,7 @@ namespace Wissance.nOrm.Tests.TestUtils
         
         protected string ConnectionString { get; set; }
 
-        private const string TestDbHost = @"localhost";
+        private const string TestDbHost = "localhost";
         private const string TestDbUser = "developer";
         private const string TestDbPassword = "123";
     }
