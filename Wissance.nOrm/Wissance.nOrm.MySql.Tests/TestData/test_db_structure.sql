@@ -34,6 +34,7 @@ CREATE TABLE `parameters` (
     ON UPDATE CASCADE
 );
 
+-- for values inserting >= 300 s 
 CREATE TABLE `parameters_values` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `value` TEXT NOT NULL,
@@ -46,6 +47,7 @@ CREATE TABLE `parameters_values` (
     ON UPDATE CASCADE
 );
 
+-- for values inserting < 300 s 
 CREATE TABLE `parameters_time_series_values` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `value` TEXT NOT NULL,
