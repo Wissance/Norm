@@ -10,7 +10,7 @@ namespace Wissance.nOrm.MySql.Repository
     public class MySqlBufferedRepository<T> : BufferedDbRepository<T>
         where T: class, new()
     {
-        public MySqlBufferedRepository(string connStr, IDbEntityQueryBuilder<T> sqlBuilder, Func<object[], T> entityFactoryFunc, ILoggerFactory loggerFactory) 
+        public MySqlBufferedRepository(string connStr, IDbEntityQueryBuilder<T> sqlBuilder, Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory) 
             : base(connStr,new MySqlAdapter(), sqlBuilder, entityFactoryFunc, loggerFactory)
         {
         }

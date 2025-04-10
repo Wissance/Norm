@@ -18,7 +18,7 @@ namespace Wissance.nOrm.Repository
         /// <param name="entityFactoryFunc">Function that creates item of type T from list of column values</param>
         /// <param name="loggerFactory"></param>
         public BufferedDbRepository(string connStr, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
-            Func<object[], T> entityFactoryFunc, ILoggerFactory loggerFactory)
+            Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory)
         {
             _connStr = connStr;
             _dbAdapter = dbAdapter;
@@ -56,7 +56,7 @@ namespace Wissance.nOrm.Repository
                         {
                             object[] tableColumns = new object[reader.FieldCount];
                             reader.GetValues(tableColumns);
-                            T obj = _entityFactoryFunc(tableColumns);
+                            T obj = _entityFactoryFunc(tableColumns, columns);
                             if (obj != null)
                             {
                                 items.Add(item);
@@ -103,7 +103,7 @@ namespace Wissance.nOrm.Repository
                         {
                             object[] tableColumns = new object[reader.FieldCount];
                             reader.GetValues(tableColumns);
-                            item = _entityFactoryFunc(tableColumns);
+                            item = _entityFactoryFunc(tableColumns, columns);
                             if (item == null)
                             {
                                 _logger.LogWarning(string.Format( "Result of object creation of {0} is NULL, ensure \"_entityFactoryFunc\" works properly",
@@ -265,7 +265,7 @@ namespace Wissance.nOrm.Repository
         private readonly DbAdapter _dbAdapter;
         private readonly IDbEntityQueryBuilder<T> _sqlBuilder;
         private readonly ILogger<BufferedDbRepository<T>> _logger;
-        private readonly Func<object[], T> _entityFactoryFunc;
+        private readonly Func<object[], IList<string>, T> _entityFactoryFunc;
         
         private readonly CancellationTokenSource _cancellationSource = new CancellationTokenSource();
         private readonly SemaphoreSlim _createSync = new SemaphoreSlim (1);

@@ -25,7 +25,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <param name="columns"></param>
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause, IList<string> columns);
+        string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null);
         
         /// <summary>
         /// 
