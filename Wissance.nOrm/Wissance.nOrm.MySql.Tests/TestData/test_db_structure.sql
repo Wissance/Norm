@@ -59,3 +59,5 @@ CREATE TABLE `parameters_time_series_values` (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
+
+-- other parameters ...
