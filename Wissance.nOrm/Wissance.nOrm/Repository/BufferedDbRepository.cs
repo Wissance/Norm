@@ -56,8 +56,8 @@ namespace Wissance.nOrm.Repository
                         {
                             object[] tableColumns = new object[reader.FieldCount];
                             reader.GetValues(tableColumns);
-                            T obj = _entityFactoryFunc(tableColumns, columns);
-                            if (obj != null)
+                            item = _entityFactoryFunc(tableColumns, columns);
+                            if (item != null)
                             {
                                 items.Add(item);
                             }

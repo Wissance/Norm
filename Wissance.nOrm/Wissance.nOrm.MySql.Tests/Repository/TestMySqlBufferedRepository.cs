@@ -4,7 +4,9 @@ using Wissance.nOrm.Repository;
 using Wissance.nOrm.Tests.Database.Entity;
 using Wissance.nOrm.Tests.Database.Entity.Builders;
 using Wissance.nOrm.Tests.Database.Entity.Factories;
+using Wissance.nOrm.Tests.TestData.Expected;
 using Wissance.nOrm.Tests.TestUtils;
+using Wissance.nOrm.Tests.TestUtils.Checkers;
 
 namespace Wissance.nOrm.Tests.Repository
 {
@@ -25,17 +27,22 @@ namespace Wissance.nOrm.Tests.Repository
         [InlineData(0, 10, 10)]
         [InlineData(1, 10, 10)]
         [InlineData(2, 10, 5)]
-        public async Task TestGetManyPhysicalValuesAsync(int? page, int? size, int expectedSize)
+        public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
             Assert.NotNull(actual);
-            Assert.Equal(expectedSize, actual.Count);
+            IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
+            if (page != null && size != null)
+            {
+                expected = expected.Skip(page.Value > 1 ? (page.Value - 1) * size.Value : 0).Take(size.Value).ToList();
+            }
+            PhysicalValueChecker.Check(expected, actual);
         }
         
         [Fact]
-        public async Task TestGetOneAsync()
+        public async Task TestGetOneWithFullColumnListAsync()
         {
         }
 

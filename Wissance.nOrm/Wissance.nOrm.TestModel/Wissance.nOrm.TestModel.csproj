@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="IndustrialMeasurementSystem" />
+      <Folder Include="IndustrialMeasure" />
     </ItemGroup>
 
 </Project>
