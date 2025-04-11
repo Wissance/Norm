@@ -41,9 +41,15 @@ namespace Wissance.nOrm.Tests.Repository
             PhysicalValueChecker.Check(expected, actual);
         }
         
-        [Fact]
-        public async Task TestGetOneWithFullColumnListAsync()
+        [Theory]
+        [InlineData(2)]
+        public async Task TestGetOneWithFullColumnListAsync(int id)
         {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", id}});
+            PhysicalValueEntity expected = ExpectedPhysicalValues.Values.First(v => v.Id == id);
+            PhysicalValueChecker.Check(expected, actual);
         }
 
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";

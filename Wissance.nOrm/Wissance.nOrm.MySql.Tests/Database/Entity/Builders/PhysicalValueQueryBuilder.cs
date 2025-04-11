@@ -42,7 +42,9 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string whereStatement = String.Empty;
             if (whereClause != null && whereClause.Any())
             {
-                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}={kv.Value}"));
+                string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
+                    kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
+                whereStatement = $" WHERE {whereStatementVal}";
             }
             string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, TableName, whereStatement);
             return query;
