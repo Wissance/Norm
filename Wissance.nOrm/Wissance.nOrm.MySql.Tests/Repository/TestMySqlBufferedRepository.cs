@@ -52,6 +52,32 @@ namespace Wissance.nOrm.Tests.Repository
             PhysicalValueChecker.Check(expected, actual);
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(20)]
+        public async Task TestInsertPhysicalValueImmediately(int id)
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity entity = new PhysicalValueEntity()
+            {
+                Id = id,
+                Name = "new phys value",
+                Description = "new phys value",
+                Designation = "NPV"
+            };
+            bool result = await repo.InsertAsync(entity, true);
+            Assert.True(result);
+        }
+        
+        [Theory]
+        [InlineData(0)]
+        [InlineData(20)]
+        public async Task TestInsertPhysicalValueInForeground(int id)
+        {
+            
+        }
+
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
         private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
     }

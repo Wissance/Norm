@@ -5,7 +5,8 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 {
     internal class PhysicalValueQueryBuilder : IDbEntityQueryBuilder<PhysicalValueEntity>
     {
-        public string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, 
+            IList<string> columns = null)
         {
             string columnsList = string.Join(", ", FullColumnsList);
             if (columns != null && columns.Any())
@@ -52,7 +53,10 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
         public string BuildInsertSqlQuery(PhysicalValueEntity entity)
         {
-            throw new NotImplementedException();
+            string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} '{3}', '{4}', '{5}')";
+            string idColumn = entity.Id > 0 ? "id," : "";
+            string idValue = entity.Id > 0 ? $"{entity.Id}," : "";
+            return string.Format(queryTemplate, TableName, idColumn, idValue, entity.Name, entity.Description, entity.Designation);
         }
 
         public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
