@@ -68,6 +68,10 @@ namespace Wissance.nOrm.Tests.Repository
             };
             bool result = await repo.InsertAsync(entity, true);
             Assert.True(result);
+            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"name", entity.Name}});
+            if (id <= 0)
+                entity.Id = actual.Id;
+            PhysicalValueChecker.Check(entity, actual);
         }
         
         [Theory]
@@ -75,7 +79,22 @@ namespace Wissance.nOrm.Tests.Repository
         [InlineData(20)]
         public async Task TestInsertPhysicalValueInForeground(int id)
         {
-            
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity entity = new PhysicalValueEntity()
+            {
+                Id = id,
+                Name = "new phys value",
+                Description = "new phys value",
+                Designation = "NPV"
+            };
+            bool result = await repo.InsertAsync(entity, false);
+            Assert.True(result);
+            Thread.Sleep(2000);
+            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"name", entity.Name}});
+            if (id <= 0)
+                entity.Id = actual.Id;
+            PhysicalValueChecker.Check(entity, actual);
         }
 
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
