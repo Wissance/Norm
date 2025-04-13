@@ -30,7 +30,7 @@ namespace Wissance.nOrm.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
@@ -46,7 +46,7 @@ namespace Wissance.nOrm.Tests.Repository
         public async Task TestGetOneWithFullColumnListAsync(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", id}});
             PhysicalValueEntity expected = ExpectedPhysicalValues.Values.First(v => v.Id == id);
             PhysicalValueChecker.Check(expected, actual);
@@ -58,7 +58,7 @@ namespace Wissance.nOrm.Tests.Repository
         public async Task TestInsertPhysicalValueImmediately(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity entity = new PhysicalValueEntity()
             {
                 Id = id,
@@ -80,7 +80,7 @@ namespace Wissance.nOrm.Tests.Repository
         public async Task TestInsertPhysicalValueInForeground(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity entity = new PhysicalValueEntity()
             {
                 Id = id,
@@ -99,5 +99,6 @@ namespace Wissance.nOrm.Tests.Repository
 
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
         private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
+        private const int BufferThreshold = 100;
     }
 }

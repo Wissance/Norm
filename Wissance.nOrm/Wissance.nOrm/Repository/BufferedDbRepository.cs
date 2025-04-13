@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Data.Common;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
 using Wissance.nOrm.Entity.QueryBuilders;
@@ -13,18 +14,26 @@ namespace Wissance.nOrm.Repository
         ///     This function construct a new instance of Repository, 1 Repository instance is for 1 table
         /// </summary>
         /// <param name="connStr">Connection string to specific database</param>
+        /// <param name="bufferThreshold"> Buffer size to start auto synchronization in background</param>
         /// <param name="dbAdapter">Adapter that contains all required ADO Net Builders</param>
         /// <param name="sqlBuilder">Builds Sql queries for provided entities</param>
         /// <param name="entityFactoryFunc">Function that creates item of type T from list of column values</param>
         /// <param name="loggerFactory"></param>
-        public BufferedDbRepository(string connStr, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
+        public BufferedDbRepository(string connStr, int bufferThreshold, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
             Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory)
         {
             _connStr = connStr;
+            _threshold = bufferThreshold;
             _dbAdapter = dbAdapter;
             _sqlBuilder = sqlBuilder;
             _entityFactoryFunc = entityFactoryFunc;
             _logger = loggerFactory.CreateLogger<BufferedDbRepository<T>>();
+            
+            Task bufferedUpsertTask = new Task(async () =>
+            {
+                await ProcessBufferedItems();
+            }, _cancellationSource.Token);
+            bufferedUpsertTask.Start();
         }
 
         public void Dispose()
@@ -260,8 +269,81 @@ namespace Wissance.nOrm.Repository
                 return -2;
             }
         }
+        
+        private async Task ProcessBufferedItems()
+        {
+            T item = new T();
+            _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' started");
+            while (!_cancellationSource.IsCancellationRequested)
+            {
+                int check = 0;
+                // 1. Process create items
+                foreach (KeyValuePair<int,IList<T>> pack in _itemsToCreate)
+                {
+                    // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
+                    check += pack.Value.Count;
+                    if (check > _threshold)
+                        break;
+                }
+
+                if (check >= _threshold)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    await _createSync.WaitAsync();
+                    // 1.2  Form Batch Within A transaction
+                    foreach (KeyValuePair<int, IList<T>> pack in _itemsToCreate)
+                    {
+                        foreach (T creatingItem in pack.Value)
+                        {
+                            sb.Append(_sqlBuilder.BuildInsertSqlQuery(creatingItem));
+                            sb.Append(" ");
+                        }
+                    }
+                    
+                    _itemsToCreate.Clear();
+                    _createSync.Release();
+                    
+                    // 1.3  Write to Database
+                    await UpsertImpl(sb.ToString());
+                }
+                
+                // 2. Process Update items
+                check = 0;
+                // 2.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
+                foreach (KeyValuePair<int,IList<T>> pack in _itemsToUpdate)
+                {
+                    // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
+                    check += pack.Value.Count;
+                    if (check > _threshold)
+                        break;
+                }
+
+                if (check >= _threshold)
+                {
+                    // 2.2  Form Batch Within A transaction
+                    StringBuilder sb = new StringBuilder();
+                    await _updateSync.WaitAsync();
+                    foreach (KeyValuePair<int, IList<T>> pack in _itemsToUpdate)
+                    {
+                        foreach (T updatingItem in pack.Value)
+                        {
+                            sb.Append(_sqlBuilder.BuildUpdateSqlQuery(updatingItem));
+                            sb.Append(" ");
+                        }
+                    }
+                    _itemsToUpdate.Clear();
+                    _updateSync.Release();
+                    // 2.3  Write to Database
+                    await UpsertImpl(sb.ToString());
+                }
+
+                await Task.Delay(100); // todo(UMV) make this param configurable!
+            }
+            _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' stopped");
+        }
 
         private readonly string _connStr;
+        private readonly int _threshold;
         private readonly DbAdapter _dbAdapter;
         private readonly IDbEntityQueryBuilder<T> _sqlBuilder;
         private readonly ILogger<BufferedDbRepository<T>> _logger;
