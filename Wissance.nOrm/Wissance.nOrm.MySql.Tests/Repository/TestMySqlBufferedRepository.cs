@@ -97,6 +97,39 @@ namespace Wissance.nOrm.Tests.Repository
             PhysicalValueChecker.Check(entity, actual);
         }
 
+        [Fact]
+        public async Task TestBulkInsertImmediately()
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            IList<PhysicalValueEntity> newPhysValues = new List<PhysicalValueEntity>()
+            {
+                new PhysicalValueEntity()
+                {
+                    Id = 30,
+                    Name = "new phys value",
+                    Description = "new phys value",
+                    Designation = "NPV"
+                },
+                new PhysicalValueEntity()
+                {
+                    Id = 31,
+                    Name = "new phys value2",
+                    Description = "new phys value2",
+                    Designation = "NPV2"
+                },
+                new PhysicalValueEntity()
+                {
+                    Id = 32,
+                    Name = "new phys value3",
+                    Description = "new phys value3",
+                    Designation = "NPV3"
+                }
+            };
+            int result = await repo.BulkInsertAsync(newPhysValues, true);
+            Assert.Equal(newPhysValues.Count, result);
+        }
+
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
         private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
         private const int BufferThreshold = 100;

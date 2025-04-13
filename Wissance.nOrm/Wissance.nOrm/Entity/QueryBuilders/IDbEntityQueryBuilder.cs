@@ -31,7 +31,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         ///     Code for build query for select one Entity from Database
         /// </summary>
         /// <param name="whereClause"></param>
-        /// <param name="columns"></param>\
+        /// <param name="columns"></param>
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
         string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null);
