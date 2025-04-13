@@ -17,10 +17,10 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         where TE : class
     {
         /// <summary>
-        /// 
+        ///     Code for build query for select multiple Entity from Database
         /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
+        /// <param name="page">page number</param>
+        /// <param name="size">size of page</param>
         /// <param name="whereClause"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
@@ -28,7 +28,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null);
         
         /// <summary>
-        /// 
+        ///     Code for build query for select one Entity from Database
         /// </summary>
         /// <param name="whereClause"></param>
         /// <param name="columns"></param>\
@@ -37,10 +37,16 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null);
 
         /// <summary>
-        /// 
+        ///     Code for build query for insert one Entity to Database
         /// </summary>
         /// <returns></returns>
         string BuildInsertSqlQuery(TE entity);
+        
+        /// <summary>
+        ///     Code for build query for insert multiple Entities to Database
+        /// </summary>
+        /// <returns></returns>
+        string BuildBulkInsertSqlQuery(IList<TE> entities);
         
         /// <summary>
         /// 

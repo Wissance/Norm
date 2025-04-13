@@ -19,6 +19,11 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             throw new NotImplementedException();
         }
 
+        public string BuildBulkInsertSqlQuery(IList<ParameterValueEntity> entities)
+        {
+            throw new NotImplementedException();
+        }
+
         public string BuildUpdateSqlQuery(ParameterValueEntity entity)
         {
             throw new NotImplementedException();

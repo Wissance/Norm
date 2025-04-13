@@ -162,20 +162,21 @@ namespace Wissance.nOrm.Repository
 
         public async Task<int> BulkInsertAsync(IList<T> items, bool immediately)
         {
-            /*try
+            try
             {
                 if (items == null || !items.Any())
                     return 0;
                 if (immediately)
                 {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (T item in items)
+                    //StringBuilder sb = new StringBuilder();
+                    /*foreach (T item in items)
                     {
-                        sb.Append(item.GetCreateSqlQuery());
+                        //sb.Append(item.GetCreateSqlQuery());
                         sb.Append(" ");
-                    }
+                    }*/
+                    string bulkInsertQuery = _sqlBuilder.BuildBulkInsertSqlQuery(items);
 
-                    int result = await UpsertImpl(sb.ToString());
+                    int result = await UpsertImpl(bulkInsertQuery);
                     return result;
                 }
 
@@ -189,8 +190,7 @@ namespace Wissance.nOrm.Repository
             {
                 //todo (umv): add logging
                 return -666;
-            }*/
-            throw new NotImplementedException();
+            }
         }
 
         public async Task<bool> UpdateAsync(T item, bool immediately)

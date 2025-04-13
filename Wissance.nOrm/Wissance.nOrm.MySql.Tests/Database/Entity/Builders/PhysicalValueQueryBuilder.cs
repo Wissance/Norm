@@ -27,6 +27,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
                 limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
             }
 
+            // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
             // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
             string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, TableName, whereStatement, limitStatement);
             return query;
@@ -57,6 +58,11 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string idColumn = entity.Id > 0 ? "id," : "";
             string idValue = entity.Id > 0 ? $"{entity.Id}," : "";
             return string.Format(queryTemplate, TableName, idColumn, idValue, entity.Name, entity.Description, entity.Designation);
+        }
+
+        public string BuildBulkInsertSqlQuery(IList<PhysicalValueEntity> entities)
+        {
+            return string.Empty;
         }
 
         public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
