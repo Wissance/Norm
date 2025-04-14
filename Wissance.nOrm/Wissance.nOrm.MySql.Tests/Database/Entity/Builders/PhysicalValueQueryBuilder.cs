@@ -92,7 +92,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
         public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
         {
-            throw new NotImplementedException();
+            return $"UPDATE {GetTableName()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id}";
         }
 
         public string GetTableSchema()

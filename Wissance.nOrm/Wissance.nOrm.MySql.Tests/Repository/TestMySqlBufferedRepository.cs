@@ -39,6 +39,7 @@ namespace Wissance.nOrm.Tests.Repository
                 expected = expected.Skip(page.Value > 1 ? (page.Value - 1) * size.Value : 0).Take(size.Value).ToList();
             }
             PhysicalValueChecker.Check(expected, actual);
+            repo.Dispose();
         }
         
         [Theory]
@@ -50,6 +51,7 @@ namespace Wissance.nOrm.Tests.Repository
             PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", id}});
             PhysicalValueEntity expected = ExpectedPhysicalValues.Values.First(v => v.Id == id);
             PhysicalValueChecker.Check(expected, actual);
+            repo.Dispose();
         }
 
         [Theory]
@@ -72,12 +74,13 @@ namespace Wissance.nOrm.Tests.Repository
             if (id <= 0)
                 entity.Id = actual.Id;
             PhysicalValueChecker.Check(entity, actual);
+            repo.Dispose();
         }
         
         [Theory]
         [InlineData(0)]
         [InlineData(20)]
-        public async Task TestInsertPhysicalValueInForeground(int id)
+        public async Task TestInsertPhysicalValueInBackground(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
@@ -95,10 +98,11 @@ namespace Wissance.nOrm.Tests.Repository
             if (id <= 0)
                 entity.Id = actual.Id;
             PhysicalValueChecker.Check(entity, actual);
+            repo.Dispose();
         }
 
         [Fact]
-        public async Task TestBulkInsertImmediately()
+        public async Task TestBulkInsertPhysicalValueImmediately()
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
@@ -128,6 +132,30 @@ namespace Wissance.nOrm.Tests.Repository
             };
             int result = await repo.BulkInsertAsync(newPhysValues, true);
             Assert.Equal(newPhysValues.Count, result);
+            repo.Dispose();
+        }
+
+        [Fact]
+        public async Task TestUpdatePhysicalValueImmediately()
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity newPhysValue = new PhysicalValueEntity()
+            {
+                Id = 30,
+                Name = "new phys value",
+                Description = "new phys value",
+                Designation = "NPV"
+            };
+
+            bool result = await repo.InsertAsync(newPhysValue, true);
+            Assert.True(result);
+            newPhysValue.Name = "new new phys value";
+            result = await repo.UpdateAsync(newPhysValue, true);
+            Assert.True(result);
+            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            PhysicalValueChecker.Check(newPhysValue, actual);
+            repo.Dispose();
         }
 
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
