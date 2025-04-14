@@ -221,7 +221,31 @@ namespace Wissance.nOrm.Repository
 
         public async Task<int> BulkUpdateAsync(IList<T> items, bool immediately)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (immediately)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (T item in items)
+                    {
+                        sb.Append(_sqlBuilder.BuildUpdateSqlQuery(item));
+                    }
+                    
+                    int result = await UpsertImpl(sb.ToString());
+                    return result;
+                }
+                
+                await _updateSync.WaitAsync(_cancellationSource.Token);
+                int key = _itemsToCreate.Keys.Any() ? _itemsToCreate.Keys.Last() + 1 : 1;
+                _itemsToUpdate[key] = items;
+                _updateSync.Release();
+                return items.Count;
+            }
+            catch (Exception e)
+            {
+                //todo (umv): add logging
+                return -777;
+            }
         }
 
         public async Task SyncAsync(int[] items)

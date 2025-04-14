@@ -11,7 +11,7 @@ namespace Wissance.nOrm.Repository
         public Task<bool> UpdateAsync(T item, bool immediately);             // immediately means now, otherwise via background process
         public Task<int> BulkUpdateAsync(IList<T> items, bool immediately);  // immediately means now, otherwise via background process
         
-        // Force Synchonize all buffered changes (to insert + to update), if items = null then synch ALL!
+        // Force Synchronize all buffered changes (to insert + to update), if items = null then synch ALL!
         public Task SyncAsync(int[] items);
         // todo(UMV): add delete in future (here we don't need it)
     }

@@ -55,7 +55,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
         public string BuildInsertSqlQuery(PhysicalValueEntity entity)
         {
             bool hasIdColumn = entity.Id > 0;
-            string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} '{3}', '{4}', '{5}')";
+            string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} '{3}', '{4}', '{5}');";
             string idColumn = hasIdColumn ? "id," : "";
             string idValue = hasIdColumn ? $"{entity.Id}," : "";
             return string.Format(queryTemplate, TableName, idColumn, idValue, entity.Name, entity.Description, entity.Designation);
@@ -92,7 +92,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
         public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
         {
-            return $"UPDATE {GetTableName()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id}";
+            return $"UPDATE {GetTableName()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
 
         public string GetTableSchema()
