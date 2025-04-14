@@ -1,5 +1,7 @@
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.TestModel;
+using Wissance.nOrm.TestModel.IndustrialMeasure;
 
 namespace Wissance.nOrm.Tests.Database.Entity.Builders
 {

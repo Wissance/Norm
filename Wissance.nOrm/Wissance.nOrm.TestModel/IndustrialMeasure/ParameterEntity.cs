@@ -1,6 +1,6 @@
-namespace Wissance.nOrm.Tests.Database.Entity
+namespace Wissance.nOrm.TestModel.IndustrialMeasure
 {
-    internal class ParameterEntity
+    public class ParameterEntity
     {
         public int Id { get; set; }
         public string Type { get; set; }

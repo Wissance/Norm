@@ -1,6 +1,6 @@
-namespace Wissance.nOrm.Tests.Database.Entity
+namespace Wissance.nOrm.TestModel.IndustrialMeasure
 {
-    internal class PhysicalValueEntity
+    public class PhysicalValueEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

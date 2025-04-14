@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.Repository;
-using Wissance.nOrm.Tests.Database.Entity;
+using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.Tests.Database.Entity.Builders;
 using Wissance.nOrm.Tests.Database.Entity.Factories;
 using Wissance.nOrm.Tests.TestData.Expected;

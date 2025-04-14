@@ -1,4 +1,4 @@
-using Wissance.nOrm.Tests.Database.Entity;
+using Wissance.nOrm.TestModel.IndustrialMeasure;
 
 namespace Wissance.nOrm.Tests.TestUtils.Checkers
 {
