@@ -7,6 +7,11 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 {
     internal class PhysicalValueQueryBuilder : IDbEntityQueryBuilder<PhysicalValueEntity>
     {
+        public PhysicalValueQueryBuilder(string schema = "")
+        {
+            _schema = schema;
+        }
+
         public string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, 
             IList<string> columns = null)
         {
@@ -31,7 +36,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
             // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
             // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
-            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, TableName, whereStatement, limitStatement);
+            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, GetTableNameWithScheme(), whereStatement, limitStatement);
             return query;
         }
 
@@ -50,7 +55,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
                     kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
                 whereStatement = $" WHERE {whereStatementVal}";
             }
-            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, TableName, whereStatement);
+            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
             return query;
         }
 
@@ -60,7 +65,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} '{3}', '{4}', '{5}');";
             string idColumn = hasIdColumn ? "id," : "";
             string idValue = hasIdColumn ? $"{entity.Id}," : "";
-            return string.Format(queryTemplate, TableName, idColumn, idValue, entity.Name, entity.Description, entity.Designation);
+            return string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, idValue, entity.Name, entity.Description, entity.Designation);
         }
 
         public string BuildBulkInsertSqlQuery(IList<PhysicalValueEntity> entities)
@@ -69,7 +74,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string columns = "name, description, designation";
             if (hasIdColumn)
                 columns = $"id, {columns}";
-            StringBuilder queryBuilder = new StringBuilder($"INSERT INTO {GetTableName()} ({columns}) VALUES");
+            StringBuilder queryBuilder = new StringBuilder($"INSERT INTO {GetTableNameWithScheme()} ({columns}) VALUES");
             bool appendComma = false;
             foreach (PhysicalValueEntity entity in entities)
             {
@@ -94,7 +99,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
         public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
         {
-            return $"UPDATE {GetTableName()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
+            return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
         public string BuildDeleteQuery(IDictionary<string, object> whereClause)
@@ -102,12 +107,12 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
                 kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
             string whereStatement = $" WHERE {whereStatementVal}";
-            return $"DELETE FROM {GetTableName()} {whereStatement}";
+            return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
         }
 
         public string GetTableSchema()
         {
-            return String.Empty;
+            return _schema;
         }
 
         public string GetTableName()
@@ -117,10 +122,20 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
 
         public string GetModelType()
         {
-            return "PhysicalValue";
+            return ModelName;
         }
 
+        private string GetTableNameWithScheme()
+        {
+            if (string.IsNullOrEmpty(GetTableSchema()))
+                return GetTableName();
+            return $"{GetTableSchema()}.{GetTableName()}";
+        }
+
+        private const string ModelName = "PhysicalValue";
         private const string TableName = "`physical_values`";
         public static IList<string> FullColumnsList = new List<string>(){"id", "name", "designation", "description"};
+
+        private readonly string _schema;
     }
 }
