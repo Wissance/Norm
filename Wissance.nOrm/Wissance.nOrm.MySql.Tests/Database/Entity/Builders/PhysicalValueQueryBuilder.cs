@@ -51,9 +51,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string whereStatement = String.Empty;
             if (whereClause != null && whereClause.Any())
             {
-                string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
-                    kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
-                whereStatement = $" WHERE {whereStatementVal}";
+                whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
             }
             string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
             return query;
@@ -104,9 +102,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
         
         public string BuildDeleteQuery(IDictionary<string, object> whereClause)
         {
-            string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
-                kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
-            string whereStatement = $" WHERE {whereStatementVal}";
+            string whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
             return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
         }
 
@@ -130,6 +126,14 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             if (string.IsNullOrEmpty(GetTableSchema()))
                 return GetTableName();
             return $"{GetTableSchema()}.{GetTableName()}";
+        }
+
+        private string BuildWhereStatementWithEqualComparison(IDictionary<string, object> whereClause)
+        {
+            string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
+                kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
+            string whereStatement = $" WHERE {whereStatementVal}";
+            return whereStatement;
         }
 
         private const string ModelName = "PhysicalValue";
