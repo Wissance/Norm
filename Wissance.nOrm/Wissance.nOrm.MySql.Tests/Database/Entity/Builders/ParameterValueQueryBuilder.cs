@@ -61,7 +61,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
             string idColumn = hasIdColumn ? "id," : "";
             string idValue = hasIdColumn ? $"{entity.Id}," : "";
             return string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, idValue, entity.ParameterId, 
-                entity.Time.UtcDateTime.ToString("YYYY-MM-DD HH:mm:ss"), entity.Value);
+                entity.Time.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"), entity.Value);
         }
 
         public string BuildBulkInsertSqlQuery(IList<ParameterValueEntity> entities)
@@ -78,7 +78,7 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
                     queryBuilder.Append(",\n");
 
                 queryBuilder.Append("(");
-                string values = $"'{entity.ParameterId}','{entity.Time.UtcDateTime.ToString("YYYY-MM-DD HH:mm:ss")}','{entity.Value}'";
+                string values = $"{entity.ParameterId},'{entity.Time.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")}','{entity.Value}'";
                 if (hasIdColumn)
                 {
                     queryBuilder.Append($"{entity.Id},");

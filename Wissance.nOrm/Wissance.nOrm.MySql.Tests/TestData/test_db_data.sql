@@ -10,8 +10,8 @@ INSERT INTO physical_values(id, name, designation, description) VALUES (9, 'Дл
 INSERT INTO physical_values(id, name, designation, description) VALUES (10, 'Электрическое сопротивление', 'R', 'Электрическое сопротивление');
 INSERT INTO physical_values(id, name, designation, description) VALUES (11, 'Вязкость', 'υ', 'Вязкость');
 INSERT INTO physical_values(id, name, designation, description) VALUES (12, 'Теплоемкость', 'C', 'Теплоемкость');
-INSERT INTO physical_values(id, name, designation, description) VALUES (13, 'Время', 't', 'Время');
-INSERT INTO physical_values(id, name, designation, description) VALUES (14, 'Скорость', 'v', 'Скорость');
+INSERT INTO physical_values(id, name, designation, description) VALUES (13, 'Время', 'ts', 'Время');
+INSERT INTO physical_values(id, name, designation, description) VALUES (14, 'Скорость', 'Vs', 'Скорость');
 INSERT INTO physical_values(id, name, designation, description) VALUES (15, 'Ускорение', 'a', 'Ускорение');
 
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
@@ -29,7 +29,7 @@ VALUES (6, 'В', 'В', 'Вольт', (SELECT id FROM physical_values AS pv WHERE
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (7, 'г/куб.см', 'г/см3', 'Грам на кубический сантиметр', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'ρ'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
-VALUES (8, 'об/мин', 'об/мин', 'Оборотов в минуту', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'v'));
+VALUES (8, 'об/мин', 'об/мин', 'Оборотов в минуту', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'Vs'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (9, 'А', 'А', 'Ампер', (SELECT id FROM physical_values AS pv WHERE pv.designation = 'I'));
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
@@ -69,91 +69,91 @@ VALUES (26, 'кДж/(кг*ºC)', '', 'Килоджоуль на килограм
 INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (27, 'час', 'час', 'Час', (SELECT id FROM physical_values AS pv WHERE pv.designation = 't'));
 
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (1, 'Температура помещения А точка 1', '', 'double', 'zone_a_temp_p1, zone_a', 
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (2, 'Температура помещения А точка 2', '', 'double', 'zone_a_temp_p2, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (3, 'Температура помещения А точка 3', '', 'double', 'zone_a_temp_p3, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (4, 'Температура помещения B точка 1', '', 'double', 'zone_b_temp_p1, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (5, 'Температура помещения B точка 2', '', 'double', 'zone_b_temp_p2, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (6, 'Температура помещения B точка 3', '', 'double', 'zone_b_temp_p3, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (7, 'Температура в электрощитовой точка 1', '', 'double', 'zone_с_temp_p1, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (8, 'Температура в электрощитовой точка 2', '', 'double', 'zone_с_temp_p2, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
 
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (9, 'Влажность помещения А точка 1', '', 'double', 'zone_a_moisture_p1, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (10, 'Влажность помещения А точка 2', '', 'double', 'zone_a_moisture_p2, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (11, 'Влажность помещения А точка 3', '', 'double', 'zone_a_moisture_p3, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (12, 'Влажность помещения B точка 1', '', 'double', 'zone_b_moisture_p1, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (13, 'Влажность помещения B точка 2', '', 'double', 'zone_b_moisture_p2, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (14, 'Влажность помещения B точка 3', '', 'double', 'zone_b_moisture_p3, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (15, 'Влажность в электрощитовой точка 1', '', 'double', 'zone_с_moisture_p1, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (16, 'Влажность в электрощитовой точка 2', '', 'double', 'zone_с_moisture_p2, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
 
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (17, 'Твердые частицы в помещении А точка 1', '', 'double', 'zone_a_particles_in_air_p1, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (18, 'Твердые частицы в помещении А точка 2', '', 'double', 'zone_a_particles_in_air_p2, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (19, 'Твердые частицы в помещении А точка 3', '', 'double', 'zone_a_particles_in_air_p3, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (20, 'Твердые частицы в помещении B точка 1', '', 'double', 'zone_b_particles_in_air_p1, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (21, 'Твердые частицы в помещении B точка 2', '', 'double', 'zone_b_particles_in_air_p2, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (22, 'Твердые частицы в помещении B точка 3', '', 'double', 'zone_b_particles_in_air_p3, zone_b',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (23, 'Твердые частицы в электрощитовой точка 1', '', 'double', 'zone_с_particles_in_air_p1, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (24, 'Твердые частицы в электрощитовой точка 2', '', 'double', 'zone_d_particles_in_air_p2, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (23, 'Твердые частицы на входе точка 1', '', 'double', 'zone_d_particles_in_air_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (24, 'Твердые частицы на входе точка 2', '', 'double', 'zone_d_particles_in_air_p2, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
 
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (25, 'Отключение / включение электроэнергии на линии точка 1', '', 'bool', 'zone_d_power_supply_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = ''), 0);
-INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, frequency)
+INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (26, 'Отключение / включение электроэнергии на линии точка 2', '', 'bool', 'zone_d_power_supply_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = ''), 0);
 -- zone A temperature 
