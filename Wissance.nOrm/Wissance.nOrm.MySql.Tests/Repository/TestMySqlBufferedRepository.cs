@@ -189,8 +189,7 @@ namespace Wissance.nOrm.Tests.Repository
             };
             int result = await repo.BulkInsertAsync(newPhysValues, true);
             Assert.Equal(newPhysValues.Count, result);
-            repo.Dispose();
-            
+
             foreach (PhysicalValueEntity entity in newPhysValues)
             {
                 entity.Name += DateTime.UtcNow.Ticks;
