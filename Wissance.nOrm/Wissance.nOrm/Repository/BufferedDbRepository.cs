@@ -250,12 +250,33 @@ namespace Wissance.nOrm.Repository
 
         public async Task<bool> DeleteAsync(IDictionary<string, object> whereClause)
         {
+            string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
+            int result = -1;
+            DbTransaction transaction = null;
             try
             {
-                return true;
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+                {
+                    await conn.OpenAsync(_cancellationSource.Token);
+                    transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
+
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(deleteQuery, conn))
+                    {
+                        result = await cmd.ExecuteNonQueryAsync();
+                    }
+                    
+                    await transaction.CommitAsync(_cancellationSource.Token);
+                    await conn.CloseAsync();
+                }
+
+                return result > 0;
             }
             catch (Exception e)
             {
+                _logger.LogError($"An error occurred during delete object of type \"{typeof(T)}\" with SQL query: \"{deleteQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                if (transaction != null)
+                    await transaction.RollbackAsync(_cancellationSource.Token);
                 return false;
             }
         }
