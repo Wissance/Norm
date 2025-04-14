@@ -28,6 +28,11 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
         {
             throw new NotImplementedException();
         }
+        
+        public string BuildDeleteQuery(IDictionary<string, object> whereClause)
+        {
+            throw new NotImplementedException();
+        }
 
         public string GetTableSchema()
         {

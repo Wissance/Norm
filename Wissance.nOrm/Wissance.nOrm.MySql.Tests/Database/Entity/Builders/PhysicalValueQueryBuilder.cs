@@ -94,6 +94,11 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
         {
             return $"UPDATE {GetTableName()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
+        
+        public string BuildDeleteQuery(IDictionary<string, object> whereClause)
+        {
+            throw new NotImplementedException();
+        }
 
         public string GetTableSchema()
         {

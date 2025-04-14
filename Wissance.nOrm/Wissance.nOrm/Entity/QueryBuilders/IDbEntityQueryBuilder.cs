@@ -49,11 +49,18 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         string BuildBulkInsertSqlQuery(IList<TE> entities);
         
         /// <summary>
-        /// 
+        ///     Code for build query for update Entity in Database
         /// </summary>
         /// <returns></returns>
         string BuildUpdateSqlQuery(TE entity);
         
+        /// <summary>
+        ///     Code for build query for delete Entities from Database
+        /// </summary>
+        /// <param name="whereClause"></param>
+        /// <returns></returns>
+        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
+        string BuildDeleteQuery(IDictionary<string, object> whereClause);
 
         /// <summary>
         ///     Returns Table Schema i.e. for postgres public

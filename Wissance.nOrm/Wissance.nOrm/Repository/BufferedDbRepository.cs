@@ -248,6 +248,18 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        public async Task<bool> DeleteAsync(IDictionary<string, object> whereClause)
+        {
+            try
+            {
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
         public async Task SyncAsync(int[] items)
         {
             throw new NotImplementedException();
