@@ -200,6 +200,27 @@ namespace Wissance.nOrm.Tests.Repository
             repo.Dispose();
         }
 
+        [Fact]
+        public async Task TestDeletePhysicalValuesImmediately()
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity newPhysValue = new PhysicalValueEntity()
+            {
+                Id = 30,
+                Name = "new phys value",
+                Description = "new phys value",
+                Designation = "NPV"
+            };
+
+            bool result = await repo.InsertAsync(newPhysValue, true);
+            Assert.True(result);
+            result = await repo.DeleteAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            Assert.True(result);
+            PhysicalValueEntity physVal = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            Assert.Null(physVal);
+        }
+
         private const string CreateScript = @"../../../TestData/test_db_structure.sql";
         private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
         private const int BufferThreshold = 100;

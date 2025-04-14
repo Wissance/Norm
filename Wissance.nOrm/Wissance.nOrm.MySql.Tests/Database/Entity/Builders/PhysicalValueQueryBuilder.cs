@@ -97,7 +97,10 @@ namespace Wissance.nOrm.Tests.Database.Entity.Builders
         
         public string BuildDeleteQuery(IDictionary<string, object> whereClause)
         {
-            throw new NotImplementedException();
+            string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
+                kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
+            string whereStatement = $" WHERE {whereStatementVal}";
+            return $"DELETE FROM {GetTableName()} {whereStatement}";
         }
 
         public string GetTableSchema()
