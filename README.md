@@ -6,7 +6,7 @@ Norm is stands for *Not an ORM* is a `C#` lib **for very HIGH Speed** `DB` data 
 2. No Lazy loading properties
 
 But it gives us the following:
-1. Read spead is fast 
+1. Read spead is fast (**10000 rows select from 100000 rows Mysql database ~100-200 ms**)
 2. Insert speed is fast (**10000 rows ~ 600 ms**, **100000 rows ~ 3000-5000 ms** on `i5` CPU for `MySql 8.0.23` with **default** settings)
 3. Can work with DB in multiple threads unlike many other `ORMs`
 
