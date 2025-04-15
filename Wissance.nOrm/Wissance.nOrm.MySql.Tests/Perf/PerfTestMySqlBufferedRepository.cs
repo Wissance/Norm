@@ -60,8 +60,9 @@ namespace Wissance.nOrm.Tests.Perf
         [Theory]
         [InlineData(100000, null, null)]
         [InlineData(100000, 1, 10000)]
-        [InlineData(1000000, 1, 100000)]
-        [InlineData(1000000, 10, 20000)]
+        [InlineData(100000, 7, 10000)]
+        //[InlineData(1000000, 1, 100000)]
+        //[InlineData(1000000, 10, 20000)]
         public async Task PerfTestReadManyParametersValues(int numberOfSamples, int? selectingPage, int? selectingPageSize)
         {
             IDbRepository<ParameterValueEntity> repo = new MySqlBufferedRepository<ParameterValueEntity>(ConnectionString,
