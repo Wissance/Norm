@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.Postgres", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.TestModel", "Wissance.nOrm.TestModel\Wissance.nOrm.TestModel.csproj", "{FDABEF1E-0835-4CB7-978C-F8A33C589617}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wissance.nOrm.Postgres.Tests", "Wissance.nOrm.Postgres.Tests\Wissance.nOrm.Postgres.Tests.csproj", "{599C1B3C-5B31-4448-91E5-5DF0FCAF0B7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{FDABEF1E-0835-4CB7-978C-F8A33C589617}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDABEF1E-0835-4CB7-978C-F8A33C589617}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDABEF1E-0835-4CB7-978C-F8A33C589617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{599C1B3C-5B31-4448-91E5-5DF0FCAF0B7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{599C1B3C-5B31-4448-91E5-5DF0FCAF0B7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{599C1B3C-5B31-4448-91E5-5DF0FCAF0B7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{599C1B3C-5B31-4448-91E5-5DF0FCAF0B7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

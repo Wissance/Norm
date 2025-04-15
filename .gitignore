@@ -26,3 +26,7 @@ Wissance.nOrm/Wissance.nOrm.TestModel/obj/
 Wissance.nOrm/Wissance.nOrm.TestModel/bin/
 
 *.user
+
+Wissance.nOrm/Wissance.nOrm.Postgres.Tests/bin/
+
+Wissance.nOrm/Wissance.nOrm.Postgres.Tests/obj/
