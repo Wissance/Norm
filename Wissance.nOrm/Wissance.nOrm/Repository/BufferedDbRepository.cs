@@ -301,7 +301,8 @@ namespace Wissance.nOrm.Repository
 
                         using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(upsertQuery, conn))
                         {
-                            result = await cmd.ExecuteNonQueryAsync();
+                            cmd.CommandTimeout = MaxCommandTimeout;
+                            result = await cmd.ExecuteNonQueryAsync(_cancellationSource.Token);
                         }
 
                         await transaction.CommitAsync(_cancellationSource.Token);
@@ -398,6 +399,8 @@ namespace Wissance.nOrm.Repository
             }
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' stopped");
         }
+
+        private const int MaxCommandTimeout = 120;
 
         private readonly string _connStr;
         private readonly int _threshold;

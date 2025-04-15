@@ -15,6 +15,8 @@ But it gives us the following:
 | 100k               | 10k              | 154      |
 | 100k               | 10k in a middle  | 190      |
 | 100k               | 100k             | 1114     |
+| 1M                 | 100k             | 1135     |
+| 1M                 | 500k             | 5624     |
 
 2. Insert speed is fast (**10000 rows ~ 600 ms**, **100000 rows ~ 3000-5000 ms** on `i5` CPU for `MySql 8.0.23` with **default** settings)
 

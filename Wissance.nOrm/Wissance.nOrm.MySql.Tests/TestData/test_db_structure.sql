@@ -60,4 +60,4 @@ CREATE TABLE `parameters_time_series_values` (
     ON UPDATE CASCADE
 );
 
--- other parameters ...
+SET GLOBAL max_allowed_packet = 134217728;
