@@ -1,4 +1,4 @@
-namespace Wissance.nOrm.TestModel.IndustrialMeasure
+namespace Wissance.nOrm.TestModel.IndustrialMeasure.Entity
 {
     public class ParameterEntity
     {

@@ -28,4 +28,8 @@
       <ProjectReference Include="..\Wissance.nOrm.TestModel\Wissance.nOrm.TestModel.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="TestUtils\Checkers" />
+    </ItemGroup>
+
 </Project>

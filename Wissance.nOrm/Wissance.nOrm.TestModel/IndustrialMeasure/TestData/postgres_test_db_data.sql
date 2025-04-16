@@ -70,7 +70,7 @@ INSERT INTO measure_units(id, name, designation, description, physical_value_id)
 VALUES (27, 'час', 'час', 'Час', (SELECT id FROM physical_values AS pv WHERE pv.designation = 't'));
 
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
-VALUES (1, 'Температура помещения А точка 1', '', 'double', 'zone_a_temp_p1, zone_a', 
+VALUES (1, 'Температура помещения А точка 1', '', 'double', 'zone_a_temp_p1, zone_a',
         (SELECT id FROM measure_units AS m WHERE m.name = 'ºC'), 300);
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
 VALUES (2, 'Температура помещения А точка 2', '', 'double', 'zone_a_temp_p2, zone_a',
@@ -144,17 +144,17 @@ INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, up
 VALUES (24, 'Твердые частицы в электрощитовой точка 2', '', 'double', 'zone_d_particles_in_air_p2, zone_с',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
-VALUES (23, 'Твердые частицы на входе точка 1', '', 'double', 'zone_d_particles_in_air_p1, zone_d',
+VALUES (25, 'Твердые частицы на входе точка 1', '', 'double', 'zone_d_particles_in_air_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
-VALUES (24, 'Твердые частицы на входе точка 2', '', 'double', 'zone_d_particles_in_air_p2, zone_d',
+VALUES (26, 'Твердые частицы на входе точка 2', '', 'double', 'zone_d_particles_in_air_p2, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = '%'), 300);
 
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
-VALUES (25, 'Отключение / включение электроэнергии на линии точка 1', '', 'bool', 'zone_d_power_supply_p1, zone_d',
+VALUES (27, 'Отключение / включение электроэнергии на линии точка 1', '', 'bool', 'zone_d_power_supply_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = ''), 0);
 INSERT INTO parameters(id, name, description, type, aliases, measure_unit_id, update_frequency)
-VALUES (26, 'Отключение / включение электроэнергии на линии точка 2', '', 'bool', 'zone_d_power_supply_p1, zone_d',
+VALUES (28, 'Отключение / включение электроэнергии на линии точка 2', '', 'bool', 'zone_d_power_supply_p1, zone_d',
         (SELECT id FROM measure_units AS m WHERE m.name = ''), 0);
 -- zone A temperature 
 INSERT INTO parameters_values(parameter_id, time, VALUE)

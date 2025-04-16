@@ -1,10 +1,10 @@
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
-using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
-namespace Wissance.nOrm.MySql.Tests.Database.Entity.Builders
+namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
 {
-    internal class ParameterValueQueryBuilder : IDbEntityQueryBuilder<ParameterValueEntity>
+    public class ParameterValueQueryBuilder : IDbEntityQueryBuilder<ParameterValueEntity>
     {
         public ParameterValueQueryBuilder(string schema = "")
         {

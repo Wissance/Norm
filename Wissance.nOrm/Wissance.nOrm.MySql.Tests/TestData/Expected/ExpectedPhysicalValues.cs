@@ -1,4 +1,5 @@
 using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
 namespace Wissance.nOrm.MySql.Tests.TestData.Expected
 {

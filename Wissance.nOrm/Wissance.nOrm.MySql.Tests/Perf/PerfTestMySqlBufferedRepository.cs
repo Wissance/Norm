@@ -3,11 +3,11 @@ using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
-using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
-using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
-using Wissance.nOrm.MySql.Tests.TestUtils;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Factories;
 using Xunit.Abstractions;
 
 namespace Wissance.nOrm.MySql.Tests.Perf
@@ -99,8 +99,8 @@ namespace Wissance.nOrm.MySql.Tests.Perf
             _outputCollector.WriteLine($"Read {actualRowsRead} rows from database containing {numberOfSamples} rows, time is : {elapsedMs} ms");
         }
 
-        private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_structure.sql";
-        private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_data.sql";
+        private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_structure.sql";
+        private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_data.sql";
         
         private readonly ITestOutputHelper _outputCollector;
     }

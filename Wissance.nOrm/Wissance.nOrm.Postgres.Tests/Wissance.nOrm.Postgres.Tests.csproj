@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Wissance.nOrm.Common.Tests\Wissance.nOrm.Common.Tests.csproj" />
       <ProjectReference Include="..\Wissance.nOrm.Postgres\Wissance.nOrm.Postgres.csproj" />
       <ProjectReference Include="..\Wissance.nOrm.TestModel\Wissance.nOrm.TestModel.csproj" />
       <ProjectReference Include="..\Wissance.nOrm\Wissance.nOrm.csproj" />

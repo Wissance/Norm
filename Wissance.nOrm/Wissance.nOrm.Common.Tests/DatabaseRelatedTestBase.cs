@@ -18,7 +18,7 @@ namespace Wissance.nOrm.Common.Tests
 
         public void PrepareDbAndData(string createScript, string insertScript)
         {
-            IDbManager dbManager = DbManagerFactory.Create(DbEngine.MySql, new LoggerFactory());
+            IDbManager dbManager = DbManagerFactory.Create(_dbEngine, new LoggerFactory());
 
             string dbNameTemplate = "nORM_Test_DB_{0}";
             Guid dbId = Guid.NewGuid();
@@ -44,7 +44,7 @@ namespace Wissance.nOrm.Common.Tests
 
         public void DestroyDb()
         {
-            IDbManager dbManager = DbManagerFactory.Create(DbEngine.MySql, new LoggerFactory());
+            IDbManager dbManager = DbManagerFactory.Create(_dbEngine, new LoggerFactory());
             dbManager.DropDatabase(ConnectionString);
         }
         

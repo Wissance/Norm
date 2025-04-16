@@ -6,4 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="xunit" Version="2.5.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Wissance.nOrm\Wissance.nOrm.csproj" />
+    </ItemGroup>
+
 </Project>

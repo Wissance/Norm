@@ -2,13 +2,13 @@ using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
-using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
-using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
 using Wissance.nOrm.MySql.Tests.TestData.Expected;
-using Wissance.nOrm.MySql.Tests.TestUtils;
-using Wissance.nOrm.MySql.Tests.TestUtils.Checkers;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Checkers;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Factories;
 
 namespace Wissance.nOrm.MySql.Tests.Repository
 {
@@ -224,8 +224,8 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             Assert.Null(physVal);
         }
 
-        private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_structure.sql";
-        private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_data.sql";
+        private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_structure.sql";
+        private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_data.sql";
         private const int BufferThreshold = 100;
     }
 }

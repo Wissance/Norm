@@ -1,8 +1,9 @@
-using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
+using Xunit;
 
-namespace Wissance.nOrm.MySql.Tests.TestUtils.Checkers
+namespace Wissance.nOrm.TestModel.IndustrialMeasure.Checkers
 {
-    internal static class PhysicalValueChecker
+    public static class PhysicalValueChecker
     {
         public static void Check(PhysicalValueEntity expected, PhysicalValueEntity actual)
         {

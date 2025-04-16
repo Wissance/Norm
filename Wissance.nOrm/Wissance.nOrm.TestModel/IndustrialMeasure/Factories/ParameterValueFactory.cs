@@ -1,8 +1,8 @@
-using Wissance.nOrm.TestModel.IndustrialMeasure;
+using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
-namespace Wissance.nOrm.MySql.Tests.Database.Entity.Factories
+namespace Wissance.nOrm.TestModel.IndustrialMeasure.Factories
 {
-    internal static class ParameterValueFactory
+    public static class ParameterValueFactory
     {
         public static ParameterValueEntity Create(IList<object> columnsValues, IList<string> columns)
         {
