@@ -95,14 +95,14 @@ namespace Wissance.nOrm.MySql.Tests.TestData.Expected
                 Id = 13,
                 Name = "Время",
                 Description = "Время",
-                Designation = "t"
+                Designation = "ts"
             },
             new PhysicalValueEntity()
             {
                 Id = 14,
                 Name = "Скорость",
                 Description = "Скорость",
-                Designation = "v"
+                Designation = "Vs"
             },
             new PhysicalValueEntity()
             {

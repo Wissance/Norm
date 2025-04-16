@@ -1,4 +1,6 @@
+using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
+using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
 using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
@@ -10,9 +12,10 @@ using Wissance.nOrm.TestModel.IndustrialMeasure;
 
 namespace Wissance.nOrm.MySql.Tests.Repository
 {
-    public class TestMySqlBufferedRepository : MySqlRelatedTestBase, IDisposable
+    public class TestMySqlBufferedRepository : DatabaseRelatedTestBase, IDisposable
     {
         public TestMySqlBufferedRepository()
+            :base(DbEngine.MySql, MySqlDefs.TestDbHost, MySqlDefs.TestDbUser, MySqlDefs.TestDbPassword)
         {
             PrepareDbAndData(CreateScript, InsertDataScript);
         }

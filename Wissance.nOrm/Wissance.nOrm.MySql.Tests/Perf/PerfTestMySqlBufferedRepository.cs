@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
+using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
 using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
@@ -10,9 +12,10 @@ using Xunit.Abstractions;
 
 namespace Wissance.nOrm.MySql.Tests.Perf
 {
-    public class PerfTestMySqlBufferedRepository : MySqlRelatedTestBase, IDisposable
+    public class PerfTestMySqlBufferedRepository : DatabaseRelatedTestBase, IDisposable
     {
         public PerfTestMySqlBufferedRepository(ITestOutputHelper outputCollector)
+            :base(DbEngine.MySql, MySqlDefs.TestDbHost, MySqlDefs.TestDbUser, MySqlDefs.TestDbPassword)
         {
             PrepareDbAndData(CreateScript, InsertDataScript);
             _outputCollector = outputCollector;

@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Wissance.nOrm.Common.Tests\Wissance.nOrm.Common.Tests.csproj" />
       <ProjectReference Include="..\Wissance.nOrm.MySql\Wissance.nOrm.MySql.csproj" />
       <ProjectReference Include="..\Wissance.nOrm.TestModel\Wissance.nOrm.TestModel.csproj" />
     </ItemGroup>
