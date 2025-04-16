@@ -224,8 +224,8 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             Assert.Null(physVal);
         }
 
-        private const string CreateScript = @"../../../TestData/test_db_structure.sql";
-        private const string InsertDataScript = @"../../../TestData/test_db_data.sql";
+        private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_structure.sql";
+        private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/test_db_data.sql";
         private const int BufferThreshold = 100;
     }
 }
