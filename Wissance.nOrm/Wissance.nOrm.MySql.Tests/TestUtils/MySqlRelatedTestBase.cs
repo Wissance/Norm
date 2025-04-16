@@ -4,7 +4,7 @@ using DbTools.Simple.Extensions;
 using DbTools.Simple.Factories;
 using Microsoft.Extensions.Logging;
 
-namespace Wissance.nOrm.Tests.TestUtils
+namespace Wissance.nOrm.MySql.Tests.TestUtils
 {
 
     public class MySqlRelatedTestBase

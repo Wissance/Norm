@@ -1,6 +1,6 @@
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 
-namespace Wissance.nOrm.Tests.Database.Entity.Factories
+namespace Wissance.nOrm.MySql.Tests.Database.Entity.Factories
 {
     internal static class ParameterValueFactory
     {

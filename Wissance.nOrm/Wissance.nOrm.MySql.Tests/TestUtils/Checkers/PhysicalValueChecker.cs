@@ -1,6 +1,6 @@
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 
-namespace Wissance.nOrm.Tests.TestUtils.Checkers
+namespace Wissance.nOrm.MySql.Tests.TestUtils.Checkers
 {
     internal static class PhysicalValueChecker
     {

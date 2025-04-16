@@ -1,7 +1,7 @@
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 
-namespace Wissance.nOrm.Tests.Perf
+namespace Wissance.nOrm.MySql.Tests.Perf
 {
     internal class ParameterValueBenchmarks
     {

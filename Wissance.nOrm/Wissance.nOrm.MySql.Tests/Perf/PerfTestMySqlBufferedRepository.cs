@@ -1,14 +1,14 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.MySql.Repository;
+using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
+using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
+using Wissance.nOrm.MySql.Tests.TestUtils;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
-using Wissance.nOrm.Tests.Database.Entity.Builders;
-using Wissance.nOrm.Tests.Database.Entity.Factories;
-using Wissance.nOrm.Tests.TestUtils;
 using Xunit.Abstractions;
 
-namespace Wissance.nOrm.Tests.Perf
+namespace Wissance.nOrm.MySql.Tests.Perf
 {
     public class PerfTestMySqlBufferedRepository : MySqlRelatedTestBase, IDisposable
     {

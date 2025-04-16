@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.MySql.Repository;
+using Wissance.nOrm.MySql.Tests.Database.Entity.Builders;
+using Wissance.nOrm.MySql.Tests.Database.Entity.Factories;
+using Wissance.nOrm.MySql.Tests.TestData.Expected;
+using Wissance.nOrm.MySql.Tests.TestUtils;
+using Wissance.nOrm.MySql.Tests.TestUtils.Checkers;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
-using Wissance.nOrm.Tests.Database.Entity.Builders;
-using Wissance.nOrm.Tests.Database.Entity.Factories;
-using Wissance.nOrm.Tests.TestData.Expected;
-using Wissance.nOrm.Tests.TestUtils;
-using Wissance.nOrm.Tests.TestUtils.Checkers;
 
-namespace Wissance.nOrm.Tests.Repository
+namespace Wissance.nOrm.MySql.Tests.Repository
 {
     public class TestMySqlBufferedRepository : MySqlRelatedTestBase, IDisposable
     {

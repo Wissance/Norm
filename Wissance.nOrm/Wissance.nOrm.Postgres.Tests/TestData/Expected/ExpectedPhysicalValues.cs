@@ -1,6 +1,6 @@
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 
-namespace Wissance.nOrm.MySql.Tests.TestData.Expected
+namespace Wissance.nOrm.Tests.TestData.Expected
 {
     internal static class ExpectedPhysicalValues
     {

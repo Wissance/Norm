@@ -1,9 +1,8 @@
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
-using Wissance.nOrm.TestModel;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 
-namespace Wissance.nOrm.Tests.Database.Entity.Builders
+namespace Wissance.nOrm.MySql.Tests.Database.Entity.Builders
 {
     internal class PhysicalValueQueryBuilder : IDbEntityQueryBuilder<PhysicalValueEntity>
     {
