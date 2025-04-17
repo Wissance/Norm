@@ -8,7 +8,7 @@ namespace Wissance.nOrm.Postgres.Connection
     {
         public DbConnection BuildConnection(string connStr)
         {
-            return new NpgsqlConnection();
+            return new NpgsqlConnection(connStr);
         }
     }
 }

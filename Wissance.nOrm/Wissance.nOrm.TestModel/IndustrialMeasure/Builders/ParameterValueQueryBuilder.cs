@@ -134,7 +134,7 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
         }
 
         private const string ModelName = "ParameterValue";
-        private const string TableName = "`parameters_values`";
+        private const string TableName = "parameters_values";
         public static IList<string> FullColumnsList = new List<string>(){"id", "parameter_id", "time", "value"};
 
         private readonly string _schema;
