@@ -1,5 +1,5 @@
 using System.Data.Common;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using Wissance.nOrm.Database.Command;
 
 namespace Wissance.nOrm.SqlServer.Command
