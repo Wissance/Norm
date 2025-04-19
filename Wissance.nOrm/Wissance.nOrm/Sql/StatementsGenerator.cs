@@ -2,7 +2,8 @@ using System.Text;
 
 namespace Wissance.nOrm.Sql
 {
-    public static class StatementsGenerator
+    // todo(UMV): temporarily not export until https://github.com/Wissance/Norm/issues/2 is solved
+    static class StatementsGenerator
     {
         public static string GenerateSelectSql(string table, IList<TableJoin> joinTables, IList<WhereParameter> parameters)
         {

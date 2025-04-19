@@ -17,7 +17,8 @@ namespace Wissance.nOrm.Sql
     }
 
     // TODO(umv): make comparisonOperator enum
-    public class WhereParameter
+    // todo(UMV): temporarily not export until https://github.com/Wissance/Norm/issues/2 is solved
+    class WhereParameter
     {
         /// <summary>
         /// Sql parameter constructor
