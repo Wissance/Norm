@@ -7,18 +7,25 @@ using Wissance.nOrm.Entity.QueryBuilders;
 
 namespace Wissance.nOrm.Repository
 {
+    /// <summary>
+    ///    This class implements IDbRepository it works via C# db driver using standard System.Data.Common
+    ///    interfaces, Db-related interfaces creating via passing Database-specific DbAdapter. Additionally this repo
+    ///    has internal buffers that writes by portions sequentially
+    /// </summary>
+    /// <typeparam name="T">Entity (table or aggregate = composition of tables)</typeparam>
     public class BufferedDbRepository<T> : IDbRepository<T>
         where T: class, new()
     {
         /// <summary>
-        ///     This function construct a new instance of Repository, 1 Repository instance is for 1 table
+        ///     This function construct a new instance of Repository, 1 Repository instance is for 1 entity
+        ///     (table or aggregate = composition of tables)
         /// </summary>
         /// <param name="connStr">Connection string to specific database</param>
         /// <param name="bufferThreshold"> Buffer size to start auto synchronization in background</param>
         /// <param name="dbAdapter">Adapter that contains all required ADO Net Builders</param>
         /// <param name="sqlBuilder">Builds Sql queries for provided entities</param>
         /// <param name="entityFactoryFunc">Function that creates item of type T from list of column values</param>
-        /// <param name="loggerFactory"></param>
+        /// <param name="loggerFactory">Logger parameter</param>
         public BufferedDbRepository(string connStr, int bufferThreshold, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
             Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory)
         {
@@ -36,6 +43,9 @@ namespace Wissance.nOrm.Repository
             bufferedUpsertTask.Start();
         }
 
+        /// <summary>
+        ///    Releases synchronization primitives, Cancel the Token
+        /// </summary>
         public void Dispose()
         {
             _cancellationSource.Cancel();
@@ -47,11 +57,11 @@ namespace Wissance.nOrm.Repository
         ///     Method for getting collection of entity items with setting size of reading portion (page, size) and
         ///     with configure selecting columns and filtering conditions
         /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <param name="whereClause"></param>
-        /// <param name="columns"></param>
-        /// <returns></returns>
+        /// <param name="page">number of page of specified size, use wisely with page</param>
+        /// <param name="size">size = amount of entities in page read, use wisely with page</param>
+        /// <param name="whereClause">filtering condition</param>
+        /// <param name="columns">selecting columns, if null - used default columns to select</param>
+        /// <returns> collection of entities <= size, if size = null  read result is unlimited</returns>
         public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
         {
             string sql = "";
