@@ -29,5 +29,10 @@ But it gives us the following:
 
 3. Can work with DB in multiple threads unlike do all `ORMs`
 
+## Nuget
 
+1. [Mysql](https://www.nuget.org/packages/Wissance.nOrm.MySql/)
+2. [Postgres](https://www.nuget.org/packages/Wissance.nOrm.Postgres/)
+3. [SqlServer](https://www.nuget.org/packages/Wissance.nOrm.SqlServer/)
+4. [SqLite](https://www.nuget.org/packages/Wissance.nOrm.Sqlite/)
 
