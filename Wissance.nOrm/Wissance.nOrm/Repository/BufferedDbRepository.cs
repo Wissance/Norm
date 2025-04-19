@@ -43,6 +43,15 @@ namespace Wissance.nOrm.Repository
             _updateSync.Dispose();
         }
 
+        /// <summary>
+        ///     Method for getting collection of entity items with setting size of reading portion (page, size) and
+        ///     with configure selecting columns and filtering conditions
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="whereClause"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
         public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
         {
             string sql = "";
@@ -162,19 +171,14 @@ namespace Wissance.nOrm.Repository
 
         public async Task<int> BulkInsertAsync(IList<T> items, bool immediately)
         {
+            string bulkInsertQuery = "";
             try
             {
                 if (items == null || !items.Any())
                     return 0;
                 if (immediately)
                 {
-                    //StringBuilder sb = new StringBuilder();
-                    /*foreach (T item in items)
-                    {
-                        //sb.Append(item.GetCreateSqlQuery());
-                        sb.Append(" ");
-                    }*/
-                    string bulkInsertQuery = _sqlBuilder.BuildBulkInsertSqlQuery(items);
+                    bulkInsertQuery = _sqlBuilder.BuildBulkInsertSqlQuery(items);
 
                     int result = await UpsertImpl(bulkInsertQuery);
                     return result;
@@ -188,20 +192,21 @@ namespace Wissance.nOrm.Repository
             }
             catch (Exception e)
             {
-                //todo (umv): add logging
+                _logger.LogError($"An error occurred during bulk insert objects of type \"{typeof(T)}\" with SQL query: \"{bulkInsertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
                 return -666;
             }
         }
 
         public async Task<bool> UpdateAsync(T item, bool immediately)
         {
-            string insertQuery = string.Empty;
+            string updateQuery = string.Empty;
             try
             {
                 if (immediately)
                 {
-                    insertQuery = _sqlBuilder.BuildUpdateSqlQuery(item);
-                    int result = await UpsertImpl(insertQuery);
+                    updateQuery = _sqlBuilder.BuildUpdateSqlQuery(item);
+                    int result = await UpsertImpl(updateQuery);
                     return result > 0;
                 }
                 
@@ -213,7 +218,7 @@ namespace Wissance.nOrm.Repository
             }
             catch (Exception e)
             {
-                _logger.LogError($"An error occurred during update object of type \"{typeof(T)}\" with SQL query: \"{insertQuery}\", error: ${e.Message}");
+                _logger.LogError($"An error occurred during update objects of type \"{typeof(T)}\" with SQL query: \"{updateQuery}\", error: ${e.Message}");
                 _logger.LogDebug(e.ToString());
                 return false;
             }
@@ -221,17 +226,17 @@ namespace Wissance.nOrm.Repository
 
         public async Task<int> BulkUpdateAsync(IList<T> items, bool immediately)
         {
+            StringBuilder bulkUpdateQueryBuilder = new StringBuilder();
             try
             {
                 if (immediately)
                 {
-                    StringBuilder sb = new StringBuilder();
                     foreach (T item in items)
                     {
-                        sb.Append(_sqlBuilder.BuildUpdateSqlQuery(item));
+                        bulkUpdateQueryBuilder.Append(_sqlBuilder.BuildUpdateSqlQuery(item));
                     }
                     
-                    int result = await UpsertImpl(sb.ToString());
+                    int result = await UpsertImpl(bulkUpdateQueryBuilder.ToString());
                     return result;
                 }
                 
@@ -243,7 +248,8 @@ namespace Wissance.nOrm.Repository
             }
             catch (Exception e)
             {
-                //todo (umv): add logging
+                _logger.LogError($"An error occurred during bulk update objects of type \"{typeof(T)}\" with SQL query: \"{bulkUpdateQueryBuilder.ToString()}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
                 return -777;
             }
         }
