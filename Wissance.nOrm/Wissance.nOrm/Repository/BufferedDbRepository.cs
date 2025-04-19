@@ -110,6 +110,12 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///    Method for getting one entity using whereClause filter
+        /// </summary>
+        /// <param name="whereClause"></param>
+        /// <param name="columns">set of columns that should be in the result set</param>
+        /// <returns></returns>
         public async Task<T> GetOneAsync(IDictionary<string, object> whereClause = null, IList<string> columns = null)
         {
             string sql = "";
@@ -153,6 +159,13 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///     Method  for Create (insert) an entity
+        /// </summary>
+        /// <param name="item"> new entity item that should be inserted in database</param>
+        /// <param name="immediately">if true we are waiting until it won't be inserted, false means in background
+        /// synchronization</param>
+        /// <returns>true if entity was inserted in DB</returns>
         public async Task<bool> InsertAsync(T item, bool immediately)
         {
             string insertQuery = string.Empty;
@@ -179,6 +192,12 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///    Method  for Create (insert) multiple entities
+        /// </summary>
+        /// <param name="items">collection of items</param>
+        /// <param name="immediately">immediately=true means creation now without using internal buffers</param>
+        /// <returns>number of inserted items</returns>
         public async Task<int> BulkInsertAsync(IList<T> items, bool immediately)
         {
             string bulkInsertQuery = "";
@@ -208,6 +227,12 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///     Method for updating entity in a database
+        /// </summary>
+        /// <param name="item"> item with values for updates item in database </param>
+        /// <param name="immediately">true means that update performs immediately</param>
+        /// <returns>true if update was successful</returns>
         public async Task<bool> UpdateAsync(T item, bool immediately)
         {
             string updateQuery = string.Empty;
@@ -234,6 +259,12 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///     Method for updating multiple entities simultaneously in a database
+        /// </summary>
+        /// <param name="items">values of updating items</param>
+        /// <param name="immediately">true means that update performs immediately</param>
+        /// <returns>number of updated items</returns>
         public async Task<int> BulkUpdateAsync(IList<T> items, bool immediately)
         {
             StringBuilder bulkUpdateQueryBuilder = new StringBuilder();
@@ -264,6 +295,11 @@ namespace Wissance.nOrm.Repository
             }
         }
 
+        /// <summary>
+        ///     Removes items from table(tables)
+        /// </summary>
+        /// <param name="whereClause">condition for removing items</param>
+        /// <returns></returns>
         public async Task<bool> DeleteAsync(IDictionary<string, object> whereClause)
         {
             string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
