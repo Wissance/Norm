@@ -26,7 +26,7 @@ namespace Wissance.nOrm.Sql
         {
             {WhereJoinCondition.Or, " OR "},
             {WhereJoinCondition.And, " AND "},
-            {WhereJoinCondition.Not, " NOT "}
+            //{WhereJoinCondition.Not, " NOT "}
         };
     }
 }
