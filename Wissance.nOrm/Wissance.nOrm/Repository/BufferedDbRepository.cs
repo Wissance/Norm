@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.Sql;
 
 namespace Wissance.nOrm.Repository
 {
@@ -62,7 +63,8 @@ namespace Wissance.nOrm.Repository
         /// <param name="whereClause">filtering condition</param>
         /// <param name="columns">selecting columns, if null - used default columns to select</param>
         /// <returns> collection of entities <= size, if size = null  read result is unlimited</returns>
-        public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public async Task<IList<T>> GetManyAsync(int? page, int? size, IList<WhereParameter> whereClause = null, 
+            IList<string> columns = null)
         {
             string sql = "";
             try
@@ -116,7 +118,7 @@ namespace Wissance.nOrm.Repository
         /// <param name="whereClause"></param>
         /// <param name="columns">set of columns that should be in the result set</param>
         /// <returns></returns>
-        public async Task<T> GetOneAsync(IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public async Task<T> GetOneAsync(IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string sql = "";
             try
@@ -300,7 +302,7 @@ namespace Wissance.nOrm.Repository
         /// </summary>
         /// <param name="whereClause">condition for removing items</param>
         /// <returns></returns>
-        public async Task<bool> DeleteAsync(IDictionary<string, object> whereClause)
+        public async Task<bool> DeleteAsync(IList<WhereParameter> whereClause)
         {
             string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
             int result = -1;

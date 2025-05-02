@@ -1,4 +1,5 @@
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
@@ -13,7 +14,7 @@ namespace Wissance.nOrm.MySql.Tests.Perf
 
         public async Task<IList<ParameterValueEntity>> RunGetManyAsync(IDbRepository<ParameterValueEntity> repository,
             int? page, int? size,
-            IDictionary<string, object> whereParams)
+            IList<WhereParameter> whereParams)
         {
             return await repository.GetManyAsync(page, size, whereParams);
         }

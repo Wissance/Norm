@@ -1,5 +1,6 @@
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
 namespace Wissance.nOrm.SqlServer.Tests.Builders
@@ -11,7 +12,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             _schema = schema;
         }
 
-        public string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, 
+        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null)
         {
             string columnsList = string.Join(", ", FullColumnsList);
@@ -39,7 +40,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return query;
         }
 
-        public string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string columnsList = string.Join(", ", FullColumnsList);
             if (columns != null && columns.Any())
@@ -127,7 +128,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return $"{GetTableSchema()}.{GetTableName()}";
         }
 
-        private string BuildWhereStatementWithEqualComparison(IDictionary<string, object> whereClause)
+        private string BuildWhereStatementWithEqualComparison(IList<WhereParameter> whereClause)
         {
             string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
                 kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));

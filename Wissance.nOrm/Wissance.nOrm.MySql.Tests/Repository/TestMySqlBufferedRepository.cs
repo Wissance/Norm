@@ -4,6 +4,7 @@ using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.MySql.Tests.TestData.Expected;
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Checkers;
@@ -34,7 +35,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
-            IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
+            IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>(), null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
             if (page != null && size != null)
@@ -51,7 +52,10 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
-            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", id}});
+            PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){id})
+            });
             PhysicalValueEntity expected = ExpectedPhysicalValues.Values.First(v => v.Id == id);
             PhysicalValueChecker.Check(expected, actual);
             repo.Dispose();
@@ -73,7 +77,10 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             };
             bool result = await repo.InsertAsync(entity, true);
             Assert.True(result);
-            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"name", entity.Name}});
+            PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name})
+            });
             if (id <= 0)
                 entity.Id = actual.Id;
             PhysicalValueChecker.Check(entity, actual);
@@ -97,7 +104,10 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             bool result = await repo.InsertAsync(entity, false);
             Assert.True(result);
             Thread.Sleep(2000);
-            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"name", entity.Name}});
+            PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name})
+            });
             if (id <= 0)
                 entity.Id = actual.Id;
             PhysicalValueChecker.Check(entity, actual);
@@ -156,7 +166,10 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             newPhysValue.Name = "new new phys value";
             result = await repo.UpdateAsync(newPhysValue, true);
             Assert.True(result);
-            PhysicalValueEntity actual = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+            });
             PhysicalValueChecker.Check(newPhysValue, actual);
             repo.Dispose();
         }
@@ -218,9 +231,15 @@ namespace Wissance.nOrm.MySql.Tests.Repository
 
             bool result = await repo.InsertAsync(newPhysValue, true);
             Assert.True(result);
-            result = await repo.DeleteAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            result = await repo.DeleteAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+            });
             Assert.True(result);
-            PhysicalValueEntity physVal = await repo.GetOneAsync(new Dictionary<string, object>() {{"id", newPhysValue.Id}});
+            PhysicalValueEntity physVal = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+            });
             Assert.Null(physVal);
         }
 

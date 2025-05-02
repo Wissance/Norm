@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
@@ -92,7 +93,7 @@ namespace Wissance.nOrm.MySql.Tests.Perf
             ParameterValueBenchmarks benchmarks = new ParameterValueBenchmarks();
             Stopwatch watch = Stopwatch.StartNew();
             IList<ParameterValueEntity> readingPage = await benchmarks.RunGetManyAsync(repo, selectingPage, selectingPageSize,
-                new Dictionary<string, object>() { });
+                new List<WhereParameter>() { });
             watch.Stop();
             long elapsedMs = watch.ElapsedMilliseconds;
             int actualRowsRead = selectingPageSize ?? numberOfSamples;
