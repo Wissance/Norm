@@ -53,15 +53,19 @@ namespace Wissance.nOrm.Sql
         ///    contains values to compare, i.e. for operator consider single value i.e. > filterValues contains only one
         ///    value, for multiple values i.e. IN, BETWEEN contains more then 1 operator
         /// </param>
+        /// <param name="valueQuotesWrap">
+        ///    defines whether single quotes should be used around values or not, we don't use Reflection here to reach
+        ///    maximum performance
+        /// </param>
         public WhereParameter(string column, WhereJoinCondition? joinCondition, bool inverted, 
-            WhereComparison comparisonOperator, IList<object> filterValues)
+            WhereComparison comparisonOperator, IList<object> filterValues, bool valueQuotesWrap = false)
         {
             Column = column;
             JoinCondition = joinCondition;
             Inverted = inverted;
             ComparisonOperator = comparisonOperator;
-            
             FilterValues = filterValues;
+            ValueQuotesWrap = valueQuotesWrap;
         }
 
         public string Column { get; set; }
@@ -70,5 +74,6 @@ namespace Wissance.nOrm.Sql
         public WhereComparison ComparisonOperator { get; set; }
         
         public WhereJoinCondition? JoinCondition { get; set; }
+        public bool ValueQuotesWrap { get; set; }
     }
 }
