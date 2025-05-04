@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.VisualBasic;
 
 namespace Wissance.nOrm.Sql
 {
@@ -20,7 +21,11 @@ namespace Wissance.nOrm.Sql
                 {
                     sb.Append(" NOT ");
                 }
+                // todo(umv): formatter required
+                string values = string.Join(",", parameter.FilterValues.Select(v => v.ToString()));
+                sb.Append(Strings.Format(FilterStatementsTemplates[parameter.ComparisonOperator], values));
             }
+           
             return sb.ToString();
         }
 
