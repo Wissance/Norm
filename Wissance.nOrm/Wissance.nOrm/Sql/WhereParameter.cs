@@ -11,13 +11,13 @@ namespace Wissance.nOrm.Sql
     /// </summary>
     public enum WhereJoinCondition
     {
-        Or,   // Or Name = Value
-        And,  // And Name = Value
+        Or = 1,   // Or Name = Value
+        And,      // And Name = Value
     }
 
     public enum WhereComparison
     {
-        Equal,
+        Equal = 1,
         NotEqual,
         Less,
         LessOrEqual,

@@ -51,7 +51,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             string whereStatement = String.Empty;
             if (whereClause != null && whereClause.Any())
             {
-                whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
+                whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
             }
             string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
             return query;
@@ -100,9 +100,9 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
-        public string BuildDeleteQuery(IDictionary<string, object> whereClause)
+        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
-            string whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
+            string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
             return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
         }
 
@@ -126,14 +126,6 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             if (string.IsNullOrEmpty(GetTableSchema()))
                 return GetTableName();
             return $"{GetTableSchema()}.{GetTableName()}";
-        }
-
-        private string BuildWhereStatementWithEqualComparison(IList<WhereParameter> whereClause)
-        {
-            string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
-                kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
-            string whereStatement = $" WHERE {whereStatementVal}";
-            return whereStatement;
         }
 
         private const string ModelName = "PhysicalValue";

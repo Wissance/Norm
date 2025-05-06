@@ -4,9 +4,9 @@ using Microsoft.VisualBasic;
 namespace Wissance.nOrm.Sql
 {
     // todo(UMV): temporarily not export until https://github.com/Wissance/Norm/issues/2 is solved
-    static class StatementsGenerator
+    public static class StatementsGenerator
     {
-        public static string BuildWhereParameters(IList<WhereParameter> parameters)
+        public static string BuildWhereStatement(IList<WhereParameter> parameters)
         {
             StringBuilder sb = new StringBuilder();
             foreach (WhereParameter parameter in parameters)
@@ -23,13 +23,15 @@ namespace Wissance.nOrm.Sql
                 }
                 // todo(umv): formatter required
                 string values = string.Join(",", parameter.FilterValues.Select(v => v.ToString()));
-                sb.Append(Strings.Format(FilterStatementsTemplates[parameter.ComparisonOperator], values));
+                string template = FilterStatementsTemplates[parameter.ComparisonOperator];
+                string fullComparison = String.Format(template, values);
+                sb.Append(fullComparison);
             }
            
             return sb.ToString();
         }
 
-        public static string GenerateSelectSql(IList<string> columns, string schema, string table,  IList<WhereParameter> parameters)
+        /*public static string GenerateSelectSql(IList<string> columns, string schema, string table,  IList<WhereParameter> parameters)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -37,7 +39,7 @@ namespace Wissance.nOrm.Sql
             
             // ...
             return sb.ToString();
-        }
+        }*/
         
         public const string SelectAllColumns = "*";
         private const string SelectTemplate = "SELECT {0} FROM {1} ";

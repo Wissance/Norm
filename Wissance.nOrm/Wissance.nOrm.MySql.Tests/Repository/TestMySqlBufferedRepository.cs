@@ -79,7 +79,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             Assert.True(result);
             PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
             {
-                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name})
+                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name}, true)
             });
             if (id <= 0)
                 entity.Id = actual.Id;
@@ -106,7 +106,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             Thread.Sleep(2000);
             PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
             {
-                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name})
+                new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name}, true)
             });
             if (id <= 0)
                 entity.Id = actual.Id;
