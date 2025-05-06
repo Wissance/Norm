@@ -22,7 +22,7 @@ namespace Wissance.nOrm.Sql
                     sb.Append(" NOT ");
                 }
                 // todo(umv): formatter required
-                string values = string.Join(",", parameter.FilterValues.Select(v => v.ToString()));
+                string values = string.Join(",", parameter.FilterValues.Select(v => parameter.ValueQuotesWrap ? $"'{v}'" : v));
                 string template = FilterStatementsTemplates[parameter.ComparisonOperator];
                 string fullComparison = String.Format(template, values);
                 sb.Append(fullComparison);

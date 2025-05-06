@@ -103,7 +103,7 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
         public string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
             string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
-            return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
+            return $"DELETE FROM {GetTableNameWithScheme()} WHERE {whereStatement}";
         }
 
         public string GetTableSchema()
