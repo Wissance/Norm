@@ -46,6 +46,29 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             repo.Dispose();
         }
         
+        [Fact]
+        public async Task TestGetManyPhysicalValuesWithIdFilerAsync()
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            IList<PhysicalValueEntity> actual = await repo.GetManyAsync(1, 10, new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Greater, 
+                    new List<object>(){5}, false),
+                new WhereParameter("id", null, false, WhereComparison.Less, 
+                    new List<object>(){10}, false)
+            }, null);
+            Assert.NotNull(actual);
+            IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values.Where(v => v.Id > 5 && v.Id < 10).ToList();
+            
+            /*if (page != null && size != null)
+            {
+                expected = expected.Skip(page.Value > 1 ? (page.Value - 1) * size.Value : 0).Take(size.Value).ToList();
+            }*/
+            PhysicalValueChecker.Check(expected, actual);
+            repo.Dispose();
+        }
+        
         [Theory]
         [InlineData(2)]
         public async Task TestGetOneWithFullColumnListAsync(int id)
