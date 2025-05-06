@@ -22,7 +22,14 @@ namespace Wissance.nOrm.Sql
                     sb.Append(" NOT ");
                 }
                 // todo(umv): formatter required
-                string values = string.Join(",", parameter.FilterValues.Select(v => parameter.ValueQuotesWrap ? $"'{v}'" : v));
+                string valuesJoin = ",";
+
+                if (parameter.ComparisonOperator == WhereComparison.Between)
+                {
+                    valuesJoin = " AND ";
+                }
+
+                string values = string.Join(valuesJoin, parameter.FilterValues.Select(v => parameter.ValueQuotesWrap ? $"'{v}'" : v));
                 string template = FilterStatementsTemplates[parameter.ComparisonOperator];
                 string fullComparison = String.Format(template, values);
                 sb.Append(fullComparison);
@@ -63,7 +70,7 @@ namespace Wissance.nOrm.Sql
             {WhereComparison.Greater, " > {0} "},
             {WhereComparison.GreaterOrEqual, " >= {0} "},
             {WhereComparison.In, " IN ({0}) "},
-            {WhereComparison.Between, " BETWEEN ({0}) "}
+            {WhereComparison.Between, " BETWEEN {0} "}
         };
     }
 }
