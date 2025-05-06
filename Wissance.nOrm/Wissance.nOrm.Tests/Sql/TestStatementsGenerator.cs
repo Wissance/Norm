@@ -27,7 +27,20 @@ namespace Wissance.nOrm.Tests.Sql
         [Fact]
         public void TestGenerateMultipleWhereCondition()
         {
-            
+            IList<WhereParameter> parameters = new List<WhereParameter>()
+            {
+                new WhereParameter("city", null, false, WhereComparison.In, 
+                    new List<object>() {"Yekaterinburg", "Perm"}, true),
+                new WhereParameter("age", WhereJoinCondition.And, false, WhereComparison.Greater, 
+                    new List<object>(){"18"}, false),
+                new WhereParameter("age", WhereJoinCondition.And, false, WhereComparison.LessOrEqual, 
+                    new List<object>(){"60"}, false),
+                new WhereParameter("name", WhereJoinCondition.Or, true, WhereComparison.In, 
+                    new List<object>(){"Ivan", "Petr"}, true)
+            };
+            string expectedStatement = "city IN ('Yekaterinburg','Perm')   AND  age > 18   AND  age <= 60   OR  name NOT  IN ('Ivan','Petr') ";
+            string actualStatement = StatementsGenerator.BuildWhereStatement(parameters);
+            Assert.Equal(expectedStatement, actualStatement);
         }
     }
 }
