@@ -11,6 +11,7 @@ namespace Wissance.nOrm.Tests.Sql
         [InlineData("name", WhereComparison.Equal, false, true, new[] {"sensor_1"}, "name = 'sensor_1' ")]
         [InlineData("value",WhereComparison.GreaterOrEqual, false, false, new[] {"50"}, "value >= 50 ")]
         [InlineData("code",WhereComparison.In, false, false, new[] {"50", "75", "90"}, "code IN (50,75,90) ")]
+        [InlineData("code",WhereComparison.In, true, false, new[] {"50", "75", "90"}, "code NOT  IN (50,75,90) ")]
         [InlineData("city",WhereComparison.In, false, true, new[] {"Yekaterinburg", "Perm", "Krasnoyarsk"}, "city IN ('Yekaterinburg','Perm','Krasnoyarsk') ")]
         [InlineData("value",WhereComparison.Between, false, false, new[] {"75", "90"}, "value BETWEEN 75 AND 90 ")]
         [InlineData("code",WhereComparison.Between, false, true, new[] {"0001", "0101"}, "code BETWEEN '0001' AND '0101' ")]
