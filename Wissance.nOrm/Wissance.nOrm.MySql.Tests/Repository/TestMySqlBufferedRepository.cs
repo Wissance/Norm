@@ -55,7 +55,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
                     new List<object>(){5}, false),
-                new WhereParameter("id", null, false, WhereComparison.Less, 
+                new WhereParameter("id", WhereJoinCondition.And, false, WhereComparison.Less, 
                     new List<object>(){10}, false)
             }, null);
             Assert.NotNull(actual);
