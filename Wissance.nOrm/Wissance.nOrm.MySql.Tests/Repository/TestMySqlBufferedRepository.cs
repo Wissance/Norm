@@ -46,25 +46,24 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             repo.Dispose();
         }
         
-        [Fact]
-        public async Task TestGetManyPhysicalValuesWithIdFilerAsync()
+        [Theory]
+        [InlineData(5, 10, 1, 10)]
+        [InlineData(2, 15, 2, 5)]
+        public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
-            IList<PhysicalValueEntity> actual = await repo.GetManyAsync(1, 10, new List<WhereParameter>()
+            IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
-                    new List<object>(){5}, false),
+                    new List<object>(){lowerIdValue}, false),
                 new WhereParameter("id", WhereJoinCondition.And, false, WhereComparison.Less, 
-                    new List<object>(){10}, false)
+                    new List<object>(){upperIdValue}, false)
             }, null);
             Assert.NotNull(actual);
-            IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values.Where(v => v.Id > 5 && v.Id < 10).ToList();
+            IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values.Where(v => v.Id > lowerIdValue && v.Id < upperIdValue).ToList();
             
-            /*if (page != null && size != null)
-            {
-                expected = expected.Skip(page.Value > 1 ? (page.Value - 1) * size.Value : 0).Take(size.Value).ToList();
-            }*/
+            expected = expected.Skip(page > 1 ? (page - 1) * size : 0).Take(size).ToList();
             PhysicalValueChecker.Check(expected, actual);
             repo.Dispose();
         }

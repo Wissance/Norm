@@ -51,7 +51,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             string whereStatement = String.Empty;
             if (whereClause != null && whereClause.Any())
             {
-                whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
+                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
             }
             string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
             return query;
