@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
 
 namespace Wissance.nOrm.Repository
@@ -27,11 +28,11 @@ namespace Wissance.nOrm.Repository
         /// <param name="sqlBuilder">Builds Sql queries for provided entities</param>
         /// <param name="entityFactoryFunc">Function that creates item of type T from list of column values</param>
         /// <param name="loggerFactory">Logger parameter</param>
-        public BufferedDbRepository(string connStr, int bufferThreshold, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
+        public BufferedDbRepository(string connStr, DbRepositorySettings settings, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
             Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory)
         {
             _connStr = connStr;
-            _threshold = bufferThreshold;
+            _settings = settings;
             _dbAdapter = dbAdapter;
             _sqlBuilder = sqlBuilder;
             _entityFactoryFunc = entityFactoryFunc;
@@ -316,6 +317,7 @@ namespace Wissance.nOrm.Repository
 
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(deleteQuery, conn))
                     {
+                        cmd.CommandTimeout = _settings.CommandTimeout;
                         result = await cmd.ExecuteNonQueryAsync();
                     }
                     
@@ -355,7 +357,7 @@ namespace Wissance.nOrm.Repository
 
                         using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(upsertQuery, conn))
                         {
-                            cmd.CommandTimeout = MaxCommandTimeout;
+                            cmd.CommandTimeout = _settings.CommandTimeout;
                             result = await cmd.ExecuteNonQueryAsync(_cancellationSource.Token);
                         }
 
@@ -394,11 +396,13 @@ namespace Wissance.nOrm.Repository
                 {
                     // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
                     check += pack.Value.Count;
-                    if (check > _threshold)
+                    if (check > _settings.BufferThreshold)
+                    {
                         break;
+                    }
                 }
 
-                if (check >= _threshold)
+                if (check >= _settings.BufferThreshold)
                 {
                     StringBuilder sb = new StringBuilder();
                     await _createSync.WaitAsync();
@@ -426,11 +430,13 @@ namespace Wissance.nOrm.Repository
                 {
                     // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
                     check += pack.Value.Count;
-                    if (check > _threshold)
+                    if (check > _settings.BufferThreshold)
+                    {
                         break;
+                    }
                 }
 
-                if (check >= _threshold)
+                if (check >= _settings.BufferThreshold)
                 {
                     // 2.2  Form Batch Within A transaction
                     StringBuilder sb = new StringBuilder();
@@ -449,19 +455,19 @@ namespace Wissance.nOrm.Repository
                     await UpsertImpl(sb.ToString());
                 }
 
-                await Task.Delay(100); // todo(UMV) make this param configurable!
+                await Task.Delay(_settings.BufferSynchronizationDelayTimeout);
             }
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' stopped");
         }
 
-        private const int MaxCommandTimeout = 120;
+        // private const int MaxCommandTimeout = 120;
 
         private readonly string _connStr;
-        private readonly int _threshold;
         private readonly DbAdapter _dbAdapter;
         private readonly IDbEntityQueryBuilder<T> _sqlBuilder;
         private readonly ILogger<BufferedDbRepository<T>> _logger;
         private readonly Func<object[], IList<string>, T> _entityFactoryFunc;
+        private readonly DbRepositorySettings _settings;
         
         private readonly CancellationTokenSource _cancellationSource = new CancellationTokenSource();
         private readonly SemaphoreSlim _createSync = new SemaphoreSlim (1);
