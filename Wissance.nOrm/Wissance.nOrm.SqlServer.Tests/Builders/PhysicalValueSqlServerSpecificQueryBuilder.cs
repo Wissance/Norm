@@ -22,10 +22,10 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             }
 
             string whereStatement = String.Empty;
-            /*if (whereClause != null && whereClause.Any())
+            if (whereClause != null && whereClause.Any())
             {
-                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}"));
-            }*/
+                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
+            }
 
             string limitStatement = String.Empty;
             if (page.HasValue && size.HasValue)

@@ -31,12 +31,13 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             if (page.HasValue && size.HasValue)
             {
                 int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
-                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
+                limitStatement = $" OFFSET {offsetValue} ROWS FETCH NEXT {size.Value} ROWS ONLY";
             }
 
             // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
             // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
-            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, GetTableNameWithScheme(), whereStatement, limitStatement);
+            string query = String.Format("SELECT {0} FROM {1} {2} ORDER BY id {3}", columnsList, 
+                                         GetTableNameWithScheme(), whereStatement, limitStatement);
             return query;
         }
 
