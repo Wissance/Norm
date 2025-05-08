@@ -4,6 +4,7 @@ using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.MySql.Tests.TestData.Expected;
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
@@ -19,6 +20,13 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             :base(DbEngine.MySql, MySqlDefs.TestDbHost, MySqlDefs.TestDbUser, MySqlDefs.TestDbPassword)
         {
             PrepareDbAndData(CreateScript, InsertDataScript);
+            _dbRepositorySettings = new DbRepositorySettings()
+            {
+                BufferThreshold = 100,
+                CommandTimeout = 120,
+                BufferSynchronizationDelayTimeout = 100,
+                ForceSynchronizationBufferDelay = 500
+            };
         }
 
         public void Dispose()
@@ -34,7 +42,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>(), null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
@@ -52,7 +60,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
@@ -73,7 +81,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestGetOneWithFullColumnListAsync(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){id})
@@ -89,7 +97,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestInsertPhysicalValueImmediately(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity entity = new PhysicalValueEntity()
             {
                 Id = id,
@@ -115,7 +123,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestInsertPhysicalValueInBackground(int id)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity entity = new PhysicalValueEntity()
             {
                 Id = id,
@@ -140,7 +148,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestBulkInsertPhysicalValuesImmediately()
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> newPhysValues = new List<PhysicalValueEntity>()
             {
                 new PhysicalValueEntity()
@@ -174,7 +182,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestUpdatePhysicalValueImmediately()
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity newPhysValue = new PhysicalValueEntity()
             {
                 Id = 30,
@@ -200,7 +208,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestBulkUpdatePhysicalValuesImmediately()
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> newPhysValues = new List<PhysicalValueEntity>()
             {
                 new PhysicalValueEntity()
@@ -242,7 +250,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         public async Task TestDeletePhysicalValuesImmediately()
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                1, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             PhysicalValueEntity newPhysValue = new PhysicalValueEntity()
             {
                 Id = 30,
@@ -267,6 +275,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
 
         private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_structure.sql";
         private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_data.sql";
-        private const int BufferThreshold = 100;
+
+        private readonly DbRepositorySettings _dbRepositorySettings;
     }
 }

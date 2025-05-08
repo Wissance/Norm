@@ -4,6 +4,7 @@ using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.Postgres.Repository;
 using Wissance.nOrm.Postgres.Tests.TestData.Expected;
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
@@ -19,6 +20,13 @@ namespace Wissance.nOrm.Postgres.Tests.Repository
             :base(DbEngine.PostgresSql, PostgresDefs.TestDbHost, PostgresDefs.TestDbUser, PostgresDefs.TestDbPassword)
         {
             PrepareDbAndData(CreateScript, InsertDataScript);
+            _dbRepositorySettings = new DbRepositorySettings()
+            {
+                BufferThreshold = 100,
+                CommandTimeout = 120,
+                BufferSynchronizationDelayTimeout = 100,
+                ForceSynchronizationBufferDelay = 500
+            };
         }
 
         public void Dispose()
@@ -34,7 +42,7 @@ namespace Wissance.nOrm.Postgres.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new PostgresBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder("public"), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder("public"), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
@@ -52,7 +60,7 @@ namespace Wissance.nOrm.Postgres.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new PostgresBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                BufferThreshold, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
@@ -70,6 +78,7 @@ namespace Wissance.nOrm.Postgres.Tests.Repository
 
         private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/postgres_test_db_structure.sql";
         private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/postgres_test_db_data.sql";
-        private const int BufferThreshold = 100;
+
+        private readonly DbRepositorySettings _dbRepositorySettings;
     }
 }

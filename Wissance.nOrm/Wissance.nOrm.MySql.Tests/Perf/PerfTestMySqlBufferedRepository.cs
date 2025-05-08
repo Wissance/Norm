@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.Repository;
+using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
@@ -20,6 +21,13 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         {
             PrepareDbAndData(CreateScript, InsertDataScript);
             _outputCollector = outputCollector;
+            _dbRepositorySettings = new DbRepositorySettings()
+            {
+                BufferThreshold = 100,
+                CommandTimeout = 120,
+                BufferSynchronizationDelayTimeout = 100,
+                ForceSynchronizationBufferDelay = 500
+            };
         }
         
         public void Dispose()
@@ -36,7 +44,7 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         public async Task PerfTestBulkInsertParametersValuesImmediately(int numberOfSamples)
         {
             IDbRepository<ParameterValueEntity> repo = new MySqlBufferedRepository<ParameterValueEntity>(ConnectionString,
-                100, new ParameterValueQueryBuilder(), ParameterValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new ParameterValueQueryBuilder(), ParameterValueFactory.Create, new NullLoggerFactory());
             IList<ParameterValueEntity> values = new List<ParameterValueEntity>();
             DateTimeOffset time = DateTimeOffset.Now.AddMonths(-3);
             Random rnd = new Random((int)DateTime.Now.Ticks);
@@ -71,7 +79,7 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         public async Task PerfTestReadManyParametersValues(int numberOfSamples, int? selectingPage, int? selectingPageSize)
         {
             IDbRepository<ParameterValueEntity> repo = new MySqlBufferedRepository<ParameterValueEntity>(ConnectionString,
-                100, new ParameterValueQueryBuilder(), ParameterValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new ParameterValueQueryBuilder(), ParameterValueFactory.Create, new NullLoggerFactory());
             IList<ParameterValueEntity> values = new List<ParameterValueEntity>();
             DateTimeOffset time = DateTimeOffset.Now.AddMonths(-3);
             Random rnd = new Random((int)DateTime.Now.Ticks);
@@ -104,5 +112,6 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/mysql_test_db_data.sql";
         
         private readonly ITestOutputHelper _outputCollector;
+        private readonly DbRepositorySettings _dbRepositorySettings;
     }
 }
