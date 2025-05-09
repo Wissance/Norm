@@ -388,14 +388,14 @@ namespace Wissance.nOrm.Repository
         {
             T item = new T();
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' started");
+            int createForceSyncCounter = 0;
+            int updateForceSyncCounter = 0;
             while (!_cancellationSource.IsCancellationRequested)
             {
                 int check = 0;
                 bool forceSyncIsOn = _settings.ForceSynchronizationBufferDelay > 0 && 
                                      _settings.ForceSynchronizationBufferDelay > _settings.BufferSynchronizationDelayTimeout;
                 int iterationsBeforeSync = (int)Math.Ceiling((decimal)_settings.ForceSynchronizationBufferDelay / _settings.BufferSynchronizationDelayTimeout);
-                int createForceSyncCounter = 0;
-                int updateForceSyncCounter = 0;
                 // 1. Process create items
                 foreach (KeyValuePair<int,IList<T>> pack in _itemsToCreate)
                 {

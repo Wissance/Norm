@@ -133,7 +133,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             };
             bool result = await repo.InsertAsync(entity, false);
             Assert.True(result);
-            Thread.Sleep(2000);
+            await Task.Delay(2000);
             PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
             {
                 new WhereParameter("name", null, false, WhereComparison.Equal, new List<object>(){entity.Name}, true)
