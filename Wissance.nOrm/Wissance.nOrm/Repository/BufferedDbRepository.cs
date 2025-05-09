@@ -337,10 +337,10 @@ namespace Wissance.nOrm.Repository
             }
         }
 
-        public async Task SyncAsync(int[] items)
+        /*public async Task SyncAsync(int[] items)
         {
             throw new NotImplementedException();
-        }
+        }*/
         
         private async Task<int> UpsertImpl(string upsertQuery)
         {
