@@ -203,6 +203,33 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             PhysicalValueChecker.Check(newPhysValue, actual);
             repo.Dispose();
         }
+        
+        [Fact]
+        public async Task TestUpdatePhysicalValueInBackground()
+        {
+            IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
+                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+            PhysicalValueEntity newPhysValue = new PhysicalValueEntity()
+            {
+                Id = 30,
+                Name = "new phys value",
+                Description = "new phys value",
+                Designation = "NPV"
+            };
+
+            bool result = await repo.InsertAsync(newPhysValue, true);
+            Assert.True(result);
+            newPhysValue.Name = "new new phys value";
+            result = await repo.UpdateAsync(newPhysValue, false);
+            Assert.True(result);
+            await Task.Delay(2000);
+            PhysicalValueEntity actual = await repo.GetOneAsync(new List<WhereParameter>()
+            {
+                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+            });
+            PhysicalValueChecker.Check(newPhysValue, actual);
+            repo.Dispose();
+        }
 
         [Fact]
         public async Task TestBulkUpdatePhysicalValuesImmediately()

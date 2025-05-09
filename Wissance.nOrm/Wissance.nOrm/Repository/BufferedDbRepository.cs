@@ -251,7 +251,7 @@ namespace Wissance.nOrm.Repository
                 await _updateSync.WaitAsync(_cancellationSource.Token);
                 int key = _itemsToUpdate.Keys.Any() ? _itemsToUpdate.Keys.Last() + 1 : 1;
                 _itemsToUpdate[key] = new List<T>() { item };
-                _createSync.Release();
+                _updateSync.Release();
                 return true;
             }
             catch (Exception e)
@@ -285,7 +285,7 @@ namespace Wissance.nOrm.Repository
                 }
                 
                 await _updateSync.WaitAsync(_cancellationSource.Token);
-                int key = _itemsToCreate.Keys.Any() ? _itemsToCreate.Keys.Last() + 1 : 1;
+                int key = _itemsToUpdate.Keys.Any() ? _itemsToUpdate.Keys.Last() + 1 : 1;
                 _itemsToUpdate[key] = items;
                 _updateSync.Release();
                 return items.Count;
