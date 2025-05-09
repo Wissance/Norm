@@ -1,5 +1,9 @@
 # Norm
 
+Ultra fast multi threads/tasks .Net Database framework.
+
+![Norm logo](img/logo/ai_3_sm.jpg)
+
 ## Features
 
 `Norm` is stands for *Not an ORM* is a `C#` lib **for very HIGH Speed** `DB` data processing in `async` way with immediately operations and at background with Processing data with Batches. It **at least 10** times faster then `EF/EF.Core`. In Comparison to ORMs Norm has following disadvantages:
