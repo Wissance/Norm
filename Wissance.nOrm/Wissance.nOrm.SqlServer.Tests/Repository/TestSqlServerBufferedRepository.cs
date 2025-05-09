@@ -60,7 +60,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new SqlServerBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                _dbRepositorySettings, new PhysicalValueQueryBuilder(), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder("dbo"), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 

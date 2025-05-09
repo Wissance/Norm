@@ -391,6 +391,11 @@ namespace Wissance.nOrm.Repository
             while (!_cancellationSource.IsCancellationRequested)
             {
                 int check = 0;
+                bool forceSyncIsOn = _settings.ForceSynchronizationBufferDelay > 0 && 
+                                     _settings.ForceSynchronizationBufferDelay > _settings.BufferSynchronizationDelayTimeout;
+                int iterationsBeforeSync = (int)Math.Ceiling((decimal)_settings.ForceSynchronizationBufferDelay / _settings.BufferSynchronizationDelayTimeout);
+                int createForceSyncCounter = 0;
+                int updateForceSyncCounter = 0;
                 // 1. Process create items
                 foreach (KeyValuePair<int,IList<T>> pack in _itemsToCreate)
                 {
@@ -402,7 +407,8 @@ namespace Wissance.nOrm.Repository
                     }
                 }
 
-                if (check >= _settings.BufferThreshold)
+                if (check >= _settings.BufferThreshold || 
+                    (createForceSyncCounter >= iterationsBeforeSync && forceSyncIsOn)) // force sync is on and it is time to sync
                 {
                     StringBuilder sb = new StringBuilder();
                     await _createSync.WaitAsync();
@@ -421,6 +427,14 @@ namespace Wissance.nOrm.Repository
                     
                     // 1.3  Write to Database
                     await UpsertImpl(sb.ToString());
+                    createForceSyncCounter = 0;
+                }
+                else
+                {
+                    if (forceSyncIsOn)
+                    {
+                        createForceSyncCounter++;
+                    }
                 }
                 
                 // 2. Process Update items
@@ -436,7 +450,8 @@ namespace Wissance.nOrm.Repository
                     }
                 }
 
-                if (check >= _settings.BufferThreshold)
+                if (check >= _settings.BufferThreshold || 
+                    (updateForceSyncCounter >= iterationsBeforeSync && forceSyncIsOn))
                 {
                     // 2.2  Form Batch Within A transaction
                     StringBuilder sb = new StringBuilder();
@@ -453,14 +468,18 @@ namespace Wissance.nOrm.Repository
                     _updateSync.Release();
                     // 2.3  Write to Database
                     await UpsertImpl(sb.ToString());
+                    updateForceSyncCounter = 0;
+                }
+                else
+                {
+                    if (forceSyncIsOn)
+                        updateForceSyncCounter++;
                 }
 
                 await Task.Delay(_settings.BufferSynchronizationDelayTimeout);
             }
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' stopped");
         }
-
-        // private const int MaxCommandTimeout = 120;
 
         private readonly string _connStr;
         private readonly DbAdapter _dbAdapter;
