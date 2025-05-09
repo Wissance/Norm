@@ -4,6 +4,8 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Wissance.nOrm.Database;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.Settings;
+using Wissance.nOrm.Sql;
 
 namespace Wissance.nOrm.Repository
 {
@@ -26,11 +28,11 @@ namespace Wissance.nOrm.Repository
         /// <param name="sqlBuilder">Builds Sql queries for provided entities</param>
         /// <param name="entityFactoryFunc">Function that creates item of type T from list of column values</param>
         /// <param name="loggerFactory">Logger parameter</param>
-        public BufferedDbRepository(string connStr, int bufferThreshold, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
+        public BufferedDbRepository(string connStr, DbRepositorySettings settings, DbAdapter dbAdapter, IDbEntityQueryBuilder<T> sqlBuilder, 
             Func<object[], IList<string>, T> entityFactoryFunc, ILoggerFactory loggerFactory)
         {
             _connStr = connStr;
-            _threshold = bufferThreshold;
+            _settings = settings;
             _dbAdapter = dbAdapter;
             _sqlBuilder = sqlBuilder;
             _entityFactoryFunc = entityFactoryFunc;
@@ -62,7 +64,8 @@ namespace Wissance.nOrm.Repository
         /// <param name="whereClause">filtering condition</param>
         /// <param name="columns">selecting columns, if null - used default columns to select</param>
         /// <returns> collection of entities <= size, if size = null  read result is unlimited</returns>
-        public async Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public async Task<IList<T>> GetManyAsync(int? page, int? size, IList<WhereParameter> whereClause = null, 
+            IList<string> columns = null)
         {
             string sql = "";
             try
@@ -116,7 +119,7 @@ namespace Wissance.nOrm.Repository
         /// <param name="whereClause"></param>
         /// <param name="columns">set of columns that should be in the result set</param>
         /// <returns></returns>
-        public async Task<T> GetOneAsync(IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public async Task<T> GetOneAsync(IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string sql = "";
             try
@@ -248,7 +251,7 @@ namespace Wissance.nOrm.Repository
                 await _updateSync.WaitAsync(_cancellationSource.Token);
                 int key = _itemsToUpdate.Keys.Any() ? _itemsToUpdate.Keys.Last() + 1 : 1;
                 _itemsToUpdate[key] = new List<T>() { item };
-                _createSync.Release();
+                _updateSync.Release();
                 return true;
             }
             catch (Exception e)
@@ -282,7 +285,7 @@ namespace Wissance.nOrm.Repository
                 }
                 
                 await _updateSync.WaitAsync(_cancellationSource.Token);
-                int key = _itemsToCreate.Keys.Any() ? _itemsToCreate.Keys.Last() + 1 : 1;
+                int key = _itemsToUpdate.Keys.Any() ? _itemsToUpdate.Keys.Last() + 1 : 1;
                 _itemsToUpdate[key] = items;
                 _updateSync.Release();
                 return items.Count;
@@ -300,7 +303,7 @@ namespace Wissance.nOrm.Repository
         /// </summary>
         /// <param name="whereClause">condition for removing items</param>
         /// <returns></returns>
-        public async Task<bool> DeleteAsync(IDictionary<string, object> whereClause)
+        public async Task<bool> DeleteAsync(IList<WhereParameter> whereClause)
         {
             string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
             int result = -1;
@@ -314,6 +317,7 @@ namespace Wissance.nOrm.Repository
 
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(deleteQuery, conn))
                     {
+                        cmd.CommandTimeout = _settings.CommandTimeout;
                         result = await cmd.ExecuteNonQueryAsync();
                     }
                     
@@ -333,10 +337,10 @@ namespace Wissance.nOrm.Repository
             }
         }
 
-        public async Task SyncAsync(int[] items)
+        /*public async Task SyncAsync(int[] items)
         {
             throw new NotImplementedException();
-        }
+        }*/
         
         private async Task<int> UpsertImpl(string upsertQuery)
         {
@@ -353,7 +357,7 @@ namespace Wissance.nOrm.Repository
 
                         using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(upsertQuery, conn))
                         {
-                            cmd.CommandTimeout = MaxCommandTimeout;
+                            cmd.CommandTimeout = _settings.CommandTimeout;
                             result = await cmd.ExecuteNonQueryAsync(_cancellationSource.Token);
                         }
 
@@ -384,19 +388,27 @@ namespace Wissance.nOrm.Repository
         {
             T item = new T();
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' started");
+            int createForceSyncCounter = 0;
+            int updateForceSyncCounter = 0;
             while (!_cancellationSource.IsCancellationRequested)
             {
                 int check = 0;
+                bool forceSyncIsOn = _settings.ForceSynchronizationBufferDelay > 0 && 
+                                     _settings.ForceSynchronizationBufferDelay > _settings.BufferSynchronizationDelayTimeout;
+                int iterationsBeforeSync = (int)Math.Ceiling((decimal)_settings.ForceSynchronizationBufferDelay / _settings.BufferSynchronizationDelayTimeout);
                 // 1. Process create items
                 foreach (KeyValuePair<int,IList<T>> pack in _itemsToCreate)
                 {
                     // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
                     check += pack.Value.Count;
-                    if (check > _threshold)
+                    if (check > _settings.BufferThreshold)
+                    {
                         break;
+                    }
                 }
 
-                if (check >= _threshold)
+                if (check >= _settings.BufferThreshold || 
+                    (createForceSyncCounter >= iterationsBeforeSync && forceSyncIsOn)) // force sync is on and it is time to sync
                 {
                     StringBuilder sb = new StringBuilder();
                     await _createSync.WaitAsync();
@@ -415,6 +427,14 @@ namespace Wissance.nOrm.Repository
                     
                     // 1.3  Write to Database
                     await UpsertImpl(sb.ToString());
+                    createForceSyncCounter = 0;
+                }
+                else
+                {
+                    if (forceSyncIsOn)
+                    {
+                        createForceSyncCounter++;
+                    }
                 }
                 
                 // 2. Process Update items
@@ -424,11 +444,14 @@ namespace Wissance.nOrm.Repository
                 {
                     // 1.1  Check whether we overcome limit (> _threshold), take empirically some of them ? (what number)
                     check += pack.Value.Count;
-                    if (check > _threshold)
+                    if (check > _settings.BufferThreshold)
+                    {
                         break;
+                    }
                 }
 
-                if (check >= _threshold)
+                if (check >= _settings.BufferThreshold || 
+                    (updateForceSyncCounter >= iterationsBeforeSync && forceSyncIsOn))
                 {
                     // 2.2  Form Batch Within A transaction
                     StringBuilder sb = new StringBuilder();
@@ -445,21 +468,25 @@ namespace Wissance.nOrm.Repository
                     _updateSync.Release();
                     // 2.3  Write to Database
                     await UpsertImpl(sb.ToString());
+                    updateForceSyncCounter = 0;
+                }
+                else
+                {
+                    if (forceSyncIsOn)
+                        updateForceSyncCounter++;
                 }
 
-                await Task.Delay(100); // todo(UMV) make this param configurable!
+                await Task.Delay(_settings.BufferSynchronizationDelayTimeout);
             }
             _logger?.LogInformation($"Background job for insert/update db model items of type: \'{_sqlBuilder.GetTableName()}\' stopped");
         }
 
-        private const int MaxCommandTimeout = 120;
-
         private readonly string _connStr;
-        private readonly int _threshold;
         private readonly DbAdapter _dbAdapter;
         private readonly IDbEntityQueryBuilder<T> _sqlBuilder;
         private readonly ILogger<BufferedDbRepository<T>> _logger;
         private readonly Func<object[], IList<string>, T> _entityFactoryFunc;
+        private readonly DbRepositorySettings _settings;
         
         private readonly CancellationTokenSource _cancellationSource = new CancellationTokenSource();
         private readonly SemaphoreSlim _createSync = new SemaphoreSlim (1);

@@ -1,3 +1,5 @@
+using Wissance.nOrm.Sql;
+
 namespace Wissance.nOrm.Repository
 {
     /// <summary>
@@ -18,15 +20,15 @@ namespace Wissance.nOrm.Repository
     public interface IDbRepository<T> : IDisposable 
         where T: class, new()
     {
-        public Task<IList<T>> GetManyAsync(int? page, int? size, IDictionary<string, object> whereClause = null, 
+        public Task<IList<T>> GetManyAsync(int? page, int? size, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null);
-        public Task<T> GetOneAsync(IDictionary<string, object> whereClause = null, IList<string> columns = null);
+        public Task<T> GetOneAsync(IList<WhereParameter> whereClause = null, IList<string> columns = null);
         public Task<bool> InsertAsync(T item, bool immediately);             // immediately = true means now, otherwise via background process
         public Task<int> BulkInsertAsync(IList<T> items, bool immediately);  // immediately means now, otherwise via background process
         public Task<bool> UpdateAsync(T item, bool immediately);             // immediately means now, otherwise via background process
         public Task<int> BulkUpdateAsync(IList<T> items, bool immediately);  // immediately means now, otherwise via background process
-        public Task<bool> DeleteAsync(IDictionary<string, object> whereClause);
-        // Force Synchronize all buffered changes (to insert + to update), if items = null then synch ALL!
-        public Task SyncAsync(int[] items);
+        public Task<bool> DeleteAsync(IList<WhereParameter> whereClause);
+        // Force Synchronize all buffered changes (to insert + to update), if items = null then sync ALL!
+        // public Task SyncAsync(int[] items);
     }
 }

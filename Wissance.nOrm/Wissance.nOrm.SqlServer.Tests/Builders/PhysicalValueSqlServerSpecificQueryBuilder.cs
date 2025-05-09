@@ -1,5 +1,6 @@
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
+using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
 namespace Wissance.nOrm.SqlServer.Tests.Builders
@@ -11,7 +12,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             _schema = schema;
         }
 
-        public string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, 
+        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null)
         {
             string columnsList = string.Join(", ", FullColumnsList);
@@ -21,10 +22,10 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             }
 
             string whereStatement = String.Empty;
-            /*if (whereClause != null && whereClause.Any())
+            if (whereClause != null && whereClause.Any())
             {
-                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}"));
-            }*/
+                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
+            }
 
             string limitStatement = String.Empty;
             if (page.HasValue && size.HasValue)
@@ -39,7 +40,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return query;
         }
 
-        public string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null)
+        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string columnsList = string.Join(", ", FullColumnsList);
             if (columns != null && columns.Any())
@@ -50,7 +51,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             string whereStatement = String.Empty;
             if (whereClause != null && whereClause.Any())
             {
-                whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
+                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
             }
             string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
             return query;
@@ -99,9 +100,9 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
-        public string BuildDeleteQuery(IDictionary<string, object> whereClause)
+        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
-            string whereStatement = BuildWhereStatementWithEqualComparison(whereClause);
+            string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
             return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
         }
 
@@ -125,14 +126,6 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             if (string.IsNullOrEmpty(GetTableSchema()))
                 return GetTableName();
             return $"{GetTableSchema()}.{GetTableName()}";
-        }
-
-        private string BuildWhereStatementWithEqualComparison(IDictionary<string, object> whereClause)
-        {
-            string whereStatementVal = string.Join(", ", whereClause.Select(kv =>
-                kv.Key == "id" ? $"{kv.Key}={kv.Value}" : $"{kv.Key}='{kv.Value}'"));
-            string whereStatement = $" WHERE {whereStatementVal}";
-            return whereStatement;
         }
 
         private const string ModelName = "PhysicalValue";

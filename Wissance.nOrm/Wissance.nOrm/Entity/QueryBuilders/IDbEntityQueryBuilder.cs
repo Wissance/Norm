@@ -1,3 +1,5 @@
+using Wissance.nOrm.Sql;
+
 namespace Wissance.nOrm.Entity.QueryBuilders
 {
     /// <summary>
@@ -25,7 +27,8 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <param name="columns"></param>
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildSelectManyQuery(int? page, int? size, IDictionary<string, object> whereClause = null, IList<string> columns = null);
+        string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
+            IList<string> columns = null);
         
         /// <summary>
         ///     Code for build query for select one Entity from Database
@@ -34,7 +37,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <param name="columns"></param>
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildSelectOneQuery(IDictionary<string, object> whereClause = null, IList<string> columns = null);
+        string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null);
 
         /// <summary>
         ///     Code for build query for insert one Entity to Database
@@ -60,7 +63,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <param name="whereClause"></param>
         /// <returns></returns>
         // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildDeleteQuery(IDictionary<string, object> whereClause);
+        string BuildDeleteQuery(IList<WhereParameter> whereClause);
 
         /// <summary>
         ///     Returns Table Schema i.e. for postgres public
