@@ -5,5 +5,6 @@ namespace Wissance.nOrm.Database.Command
     public interface ICommandBuilder
     {
         DbCommand BuildCommand(string sqlCmd, DbConnection conn);
+        DbCommand BuildCommand(DbConnection conn);
     }
 }
