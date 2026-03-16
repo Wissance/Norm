@@ -129,10 +129,10 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    // sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
                     // 2. Create Command from Adapter
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
                     {
+                        _sqlBuilder.BuildSelectOneCommandQueryAndParams(cmd, whereClause, columns);
                         // 3. Execute Db Reader && read
                         DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
                         // 4. Construct item from a fieldset using a Factory method

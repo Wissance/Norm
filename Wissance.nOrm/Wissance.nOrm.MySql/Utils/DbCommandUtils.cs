@@ -11,8 +11,6 @@ namespace Wissance.nOrm.MySql.Utils
             if (whereParameters == null)
                 return;
             int parameterCounter = 1;
-            // const string valuesJoin = ",";
-            //MySqlCommand mySqlCommand = command as MySqlCommand;
             foreach (WhereParameter parameter in whereParameters)
             {
                 string pName = $"@p{parameterCounter}";
