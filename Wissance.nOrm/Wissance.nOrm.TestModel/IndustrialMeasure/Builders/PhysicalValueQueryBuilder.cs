@@ -57,10 +57,10 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
-        public override string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        /*public override string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
             string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
             return $"DELETE FROM {GetTableNameWithScheme()} WHERE {whereStatement}";
-        }
+        }*/
     }
 }

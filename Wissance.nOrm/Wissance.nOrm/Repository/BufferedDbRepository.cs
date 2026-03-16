@@ -305,9 +305,9 @@ namespace Wissance.nOrm.Repository
         /// <returns></returns>
         public async Task<bool> DeleteAsync(IList<WhereParameter> whereClause)
         {
-            string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
             int result = -1;
             DbTransaction transaction = null;
+            string deleteQuery = "";
             try
             {
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
@@ -315,8 +315,10 @@ namespace Wissance.nOrm.Repository
                     await conn.OpenAsync(_cancellationSource.Token);
                     transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
 
-                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(deleteQuery, conn))
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(conn))
                     {
+                        _sqlBuilder.BuildDeleteCommandQueryAndParams(cmd, whereClause);
+                        deleteQuery = cmd.CommandText;
                         cmd.CommandTimeout = _settings.CommandTimeout;
                         result = await cmd.ExecuteNonQueryAsync();
                     }

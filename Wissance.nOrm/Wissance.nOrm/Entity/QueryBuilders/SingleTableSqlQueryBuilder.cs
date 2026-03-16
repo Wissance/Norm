@@ -18,7 +18,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             _commandParametersHandler = commandParametersHandler;
         }
 
-        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        public virtual string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string columnsList = string.Join(", ", _config.FullColumnList);
             if (columns != null && columns.Any())
@@ -27,10 +27,10 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             }
 
             string whereStatement = String.Empty;
-            /*if (whereClause != null && whereClause.Any())
+            if (whereClause != null && whereClause.Any())
             {
-                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}"));
-            }*/
+                whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
+            }
 
             string limitStatement = String.Empty;
             if (page.HasValue && size.HasValue)
@@ -45,7 +45,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             return query;
         }
 
-        public void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, IList<WhereParameter> whereClause = null,
+        public virtual void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, IList<WhereParameter> whereClause = null,
             IList<string> columns = null)
         {
             string columnsList = string.Join(", ", _config.FullColumnList);
@@ -68,7 +68,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             _commandParametersHandler(command, whereClause);
         }
 
-        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        public virtual string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
         {
             string columnsList = string.Join(", ", _config.FullColumnList);
             if (columns != null && columns.Any())
@@ -85,7 +85,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             return query;
         }
 
-        public void BuildSelectOneCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause = null, 
+        public virtual void BuildSelectOneCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null)
         {
             string columnsList = string.Join(", ", _config.FullColumnList);
@@ -105,7 +105,18 @@ namespace Wissance.nOrm.Entity.QueryBuilders
 
         public abstract string BuildUpdateSqlQuery(TE entity);
 
-        public abstract string BuildDeleteQuery(IList<WhereParameter> whereClause);
+        public virtual string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        {
+            string whereStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause);
+            return $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
+        }
+
+        public virtual void BuildDeleteCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause)
+        {
+            string whereStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause);
+            command.CommandText = $"DELETE FROM {GetTableNameWithScheme()} {whereStatement}";
+            _commandParametersHandler(command, whereClause);
+        }
 
         public virtual string GetTableSchema()
         {

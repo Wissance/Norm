@@ -59,9 +59,9 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             throw new NotImplementedException();
         }
         
-        public override string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        /*public override string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }

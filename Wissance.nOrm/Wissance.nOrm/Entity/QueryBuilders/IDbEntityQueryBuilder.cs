@@ -38,11 +38,11 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         ///     Code for build query for select multiple Entity from Database. This method assume that parameters are placing
         ///     by mention @p1 and so on.
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <param name="whereClause"></param>
-        /// <param name="columns"></param>
+        /// <param name="command">DbCommand to be configured Command and Parameters</param>
+        /// <param name="page">rows to skip size*(page-1)</param>
+        /// <param name="size">size of portion in a number of rows</param>
+        /// <param name="whereClause">set of WhereParameters</param>
+        /// <param name="columns">columns to select</param>
         void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null);
         
@@ -84,12 +84,19 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         string BuildUpdateSqlQuery(TE entity);
         
         /// <summary>
-        ///     Code for build query for delete Entities from Database
+        ///     Code for build query for delete Entities from Database. This is an Unsafe method because
+        ///     it assumes direct placeholder replacement. Safe version is BuildDeleteCommandQueryAndParams
         /// </summary>
         /// <param name="whereClause"></param>
         /// <returns></returns>
-        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
         string BuildDeleteQuery(IList<WhereParameter> whereClause);
+        
+        /// <summary>
+        ///     Safe version of Delete operation because it is using parameters substitution
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="whereClause"></param>
+        void BuildDeleteCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause);
 
         /// <summary>
         ///     Returns Table Schema i.e. for postgres public
