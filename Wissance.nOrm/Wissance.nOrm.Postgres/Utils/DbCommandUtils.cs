@@ -1,8 +1,8 @@
 using System.Data.Common;
-using MySql.Data.MySqlClient;
+using Npgsql;
 using Wissance.nOrm.Sql;
 
-namespace Wissance.nOrm.MySql.Utils
+namespace Wissance.nOrm.Postgres.Utils
 {
     public static class DbCommandUtils
     {
@@ -17,25 +17,25 @@ namespace Wissance.nOrm.MySql.Utils
                 
                 if (parameter.ComparisonOperator == WhereComparison.Between)
                 {
-                    MySqlParameter p1 = new MySqlParameter(pName, parameter.FilterValues[0]);
+                    NpgsqlParameter p1 = new NpgsqlParameter(pName, parameter.FilterValues[0]);
                     command.Parameters.Add(p1);
                     
                     parameterCounter++;
                     pName = $"@p{parameterCounter}";
-                    MySqlParameter p2 = new MySqlParameter(pName, parameter.FilterValues[1]);
+                    NpgsqlParameter p2 = new NpgsqlParameter(pName, parameter.FilterValues[1]);
                     command.Parameters.Add(p2);
                 }
                 else
                 {
                     if (parameter.FilterValues.Count == 1)
                     {
-                        MySqlParameter p = new MySqlParameter(pName, parameter.FilterValues[0]);
+                        NpgsqlParameter p = new NpgsqlParameter(pName, parameter.FilterValues[0]);
                         command.Parameters.Add(p);
                     }
                     else
                     {
                         // probably IN (....)
-                        MySqlParameter p = new MySqlParameter(pName, parameter.FilterValues);
+                        NpgsqlParameter p = new NpgsqlParameter(pName, parameter.FilterValues);
                         command.Parameters.Add(p);
                     }
                 }
