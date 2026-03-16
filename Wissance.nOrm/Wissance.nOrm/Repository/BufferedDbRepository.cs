@@ -76,12 +76,10 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    // TODO(UMV): _sqlBuilder.BuildSelectCmd()
-                    sql = _sqlBuilder.BuildSelectManyQuery(page, size, whereClause, columns);
                     // 2. Create Command from Adapter
-                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(conn))
                     {
-                        
+                        _sqlBuilder.BuildSelectManyCommandQueryAndParams(cmd, page, size, whereClause, columns);
                         // 3. Execute Db Reader && read
                         DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
                         // 4. Construct item from a fieldset using a Factory method
@@ -131,7 +129,7 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
+                    // sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
                     // 2. Create Command from Adapter
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
                     {

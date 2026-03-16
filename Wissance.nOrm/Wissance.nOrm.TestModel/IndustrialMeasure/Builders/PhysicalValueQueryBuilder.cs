@@ -1,89 +1,20 @@
 using System.Data.Common;
 using System.Text;
+using Wissance.nOrm.Entity.Config;
 using Wissance.nOrm.Entity.QueryBuilders;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
 namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
 {
-    public class PhysicalValueQueryBuilder : IDbEntityQueryBuilder<PhysicalValueEntity>
+    public class PhysicalValueQueryBuilder : SingleTableSqlQueryBuilder<PhysicalValueEntity>
     {
-        public PhysicalValueQueryBuilder(Action<DbCommand, IList<WhereParameter>> commandParametersHandler , string schema = "")
+        public PhysicalValueQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler)
+            :base(config, commandParametersHandler)
         {
-            _schema = schema;
-            _commandParametersHandler = commandParametersHandler;
         }
 
-        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
-            IList<string> columns = null)
-        {
-            string columnsList = string.Join(", ", FullColumnsList);
-            if (columns != null && columns.Any())
-            {
-                columnsList = string.Join(", ", columns);
-            }
-
-            string whereStatement = String.Empty;
-            if (whereClause != null && whereClause.Any())
-            {
-                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
-            }
-
-            string limitStatement = String.Empty;
-            if (page.HasValue && size.HasValue)
-            {
-                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
-                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
-            }
-
-            // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
-            // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
-            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, 
-                                         GetTableNameWithScheme(), whereStatement, limitStatement);
-            return query;
-        }
-
-        public void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, 
-                                                         IList<WhereParameter> whereClause = null, IList<string> columns = null)
-        {
-            string columnsList = string.Join(", ", FullColumnsList);
-            if (columns != null && columns.Any())
-            {
-                columnsList = string.Join(", ", columns);
-            }
-            
-            string limitStatement = String.Empty;
-            if (page.HasValue && size.HasValue)
-            {
-                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
-                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
-            }
-
-            string wherePreparedStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause ?? new List<WhereParameter>());
-            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, 
-                GetTableNameWithScheme(), wherePreparedStatement, limitStatement);
-            command.CommandText = query;
-            _commandParametersHandler(command, whereClause);
-        }
-
-        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
-        {
-            string columnsList = string.Join(", ", FullColumnsList);
-            if (columns != null && columns.Any())
-            {
-                columnsList = string.Join(", ", columns);
-            }
-            
-            string whereStatement = String.Empty;
-            if (whereClause != null && whereClause.Any())
-            {
-                whereStatement = $" WHERE {StatementsGenerator.BuildWhereStatement(whereClause)}";
-            }
-            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
-            return query;
-        }
-
-        public string BuildInsertSqlQuery(PhysicalValueEntity entity)
+        public override string BuildInsertSqlQuery(PhysicalValueEntity entity)
         {
             bool hasIdColumn = entity.Id > 0;
             string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} '{3}', '{4}', '{5}');";
@@ -92,7 +23,7 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             return string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, idValue, entity.Name, entity.Description, entity.Designation);
         }
 
-        public string BuildBulkInsertSqlQuery(IList<PhysicalValueEntity> entities)
+        public override string BuildBulkInsertSqlQuery(IList<PhysicalValueEntity> entities)
         {
             bool hasIdColumn = entities[0].Id > 0;
             string columns = "name, description, designation";
@@ -121,44 +52,15 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             return queryBuilder.ToString();
         }
 
-        public string BuildUpdateSqlQuery(PhysicalValueEntity entity)
+        public override string BuildUpdateSqlQuery(PhysicalValueEntity entity)
         {
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
-        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        public override string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
             string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
             return $"DELETE FROM {GetTableNameWithScheme()} WHERE {whereStatement}";
         }
-
-        public string GetTableSchema()
-        {
-            return _schema;
-        }
-
-        public string GetTableName()
-        {
-            return TableName;
-        }
-
-        public string GetModelType()
-        {
-            return ModelName;
-        }
-
-        private string GetTableNameWithScheme()
-        {
-            if (string.IsNullOrEmpty(GetTableSchema()))
-                return GetTableName();
-            return $"{GetTableSchema()}.{GetTableName()}";
-        }
-
-        private const string ModelName = "PhysicalValue";
-        private const string TableName = "physical_values";
-        public static IList<string> FullColumnsList = new List<string>(){"id", "name", "designation", "description"};
-
-        private readonly string _schema;
-        private readonly Action<DbCommand, IList<WhereParameter>> _commandParametersHandler;
     }
 }

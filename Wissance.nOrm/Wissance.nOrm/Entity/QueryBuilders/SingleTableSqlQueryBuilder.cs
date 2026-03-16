@@ -100,25 +100,12 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             _commandParametersHandler(command, whereClause);
         }
 
-        public string BuildInsertSqlQuery(TE entity)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract string BuildInsertSqlQuery(TE entity);
+        public abstract string BuildBulkInsertSqlQuery(IList<TE> entities);
 
-        public string BuildBulkInsertSqlQuery(IList<TE> entities)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract string BuildUpdateSqlQuery(TE entity);
 
-        public string BuildUpdateSqlQuery(TE entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract string BuildDeleteQuery(IList<WhereParameter> whereClause);
 
         public virtual string GetTableSchema()
         {
@@ -135,7 +122,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             return _config.Model;
         }
         
-        private string GetTableNameWithScheme()
+        protected string GetTableNameWithScheme()
         {
             if (string.IsNullOrEmpty(GetTableSchema()))
                 return GetTableName();
