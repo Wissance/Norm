@@ -1,12 +1,14 @@
 using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
+using Wissance.nOrm.Entity.Config;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.SqlServer.Repository;
 using Wissance.nOrm.SqlServer.Tests.Builders;
 using Wissance.nOrm.SqlServer.Tests.TestData.Expected;
+using Wissance.nOrm.SqlServer.Utils;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Builders;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Checkers;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
@@ -27,6 +29,8 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
                 BufferSynchronizationDelayTimeout = 100,
                 ForceSynchronizationBufferDelay = 500
              };
+            _physicalValueConfig = new EntityConfig("dbo", PhysicalValueTableName, "PhysicalValue",
+                new List<string>(){"id", "name", "designation", "description"});
         }
         
         public void Dispose()
@@ -42,7 +46,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new SqlServerBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder("dbo"), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
@@ -60,7 +64,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new SqlServerBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder("dbo"), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters), PhysicalValueFactory.Create, new NullLoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
@@ -79,6 +83,9 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         private const string CreateScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/sqlserver_test_db_structure.sql";
         private const string InsertDataScript = @"../../../../Wissance.nOrm.TestModel/IndustrialMeasure/TestData/sqlserver_test_db_data.sql";
         
+        private const string PhysicalValueTableName = "physical_values";
+        
         private readonly DbRepositorySettings _dbRepositorySettings;
+        private readonly EntityConfig _physicalValueConfig;
     }
 }
