@@ -30,7 +30,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
                 ForceSynchronizationBufferDelay = 500
             };
             _physValueEntityConfig = new EntityConfig(string.Empty, PhysValuesTableName, "PhysicalValue",
-                new List<string>(){"id", "name", " description", "designation"});
+                new List<string>(){"id", "name", "designation", "description"});
         }
 
         public void Dispose()
@@ -61,7 +61,7 @@ namespace Wissance.nOrm.MySql.Tests.Repository
         [Theory]
         [InlineData(5, 10, 1, 10)]
         [InlineData(2, 15, 2, 5)]
-        public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
+        public async Task TestGetManyPhysicalValuesWithIdFilterAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new MySqlBufferedRepository<PhysicalValueEntity>(ConnectionString,
                 _dbRepositorySettings, new PhysicalValueQueryBuilder(_physValueEntityConfig, DbCommandUtils.PassDbParameters), PhysicalValueFactory.Create, new NullLoggerFactory());
@@ -294,12 +294,14 @@ namespace Wissance.nOrm.MySql.Tests.Repository
             Assert.True(result);
             result = await repo.DeleteAsync(new List<WhereParameter>()
             {
-                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+                new WhereParameter("id", null, false, WhereComparison.Equal, 
+                    new List<object>(){newPhysValue.Id})
             });
             Assert.True(result);
             PhysicalValueEntity physVal = await repo.GetOneAsync(new List<WhereParameter>()
             {
-                new WhereParameter("id", null, false, WhereComparison.Equal, new List<object>(){newPhysValue.Id})
+                new WhereParameter("id", null, false, WhereComparison.Equal, 
+                    new List<object>(){newPhysValue.Id})
             });
             Assert.Null(physVal);
         }

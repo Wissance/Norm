@@ -34,7 +34,10 @@ namespace Wissance.nOrm.Sql
                 string fullComparison = String.Format(template, values);
                 sb.Append(fullComparison);
             }
-           
+            if (sb.Length > 0)
+            {
+                sb.Insert(0, "WHERE ");
+            }
             return sb.ToString();
         }
 
@@ -70,6 +73,10 @@ namespace Wissance.nOrm.Sql
                 paramCounter++;
             }
 
+            if (sb.Length > 0)
+            {
+                sb.Insert(0, "WHERE ");
+            }
             return sb.ToString();
         }
 
