@@ -13,6 +13,7 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             :base(config, commandParametersHandler)
         {
             _config = config;
+            _commandParametersHandler = commandParametersHandler;
         }
 
         public override string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
