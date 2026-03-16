@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Wissance.nOrm.Sql;
 
 namespace Wissance.nOrm.Entity.QueryBuilders
@@ -12,6 +13,9 @@ namespace Wissance.nOrm.Entity.QueryBuilders
     ///            it forms an SQL like SELECT (col1, col2, ...) FROM @GetTableSchema().@GetTableName() WHERE (col1=...)
     ///         4. GetSelectOneQuery returns Query to SELECT a single item based in WHERE clauses,
     ///            it forms an SQL like SELECT (col1, col2, ...) FROM @GetTableSchema().@GetTableName() WHERE (col1=...)
+    ///      Notes:
+    ///         1. Methods without DbCommand are Unsafe methods
+    ///         2. Methods with DbCommand params are safe methods i.e. BuildSelectManyCommandQueryAndParams
     ///      Entity is a class that related with table.
     /// </summary>
     /// <typeparam name="TE"> Entity </typeparam>
@@ -19,25 +23,47 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         where TE : class
     {
         /// <summary>
-        ///     Code for build query for select multiple Entity from Database
+        ///     Code for build query for select multiple Entity from Database. This method assume that
+        ///     parameters in whereClause are placed without processing in Raw SQL. Therefore this
+        ///     is an Unsafe method, safe version is a BuildSelectManyCommandQueryAndParams.
         /// </summary>
         /// <param name="page">page number</param>
         /// <param name="size">size of page</param>
+        /// <param name="whereClause">a set of where params</param>
+        /// <param name="columns">list of columns to select, if not defined all columns will be selected</param>
+        /// <returns></returns>
+        string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null);
+
+        /// <summary>
+        ///     Code for build query for select multiple Entity from Database. This method assume that parameters are placing
+        ///     by mention @p1 and so on.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
         /// <param name="whereClause"></param>
         /// <param name="columns"></param>
-        /// <returns></returns>
-        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
-        string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
+        void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, IList<WhereParameter> whereClause = null, 
             IList<string> columns = null);
         
         /// <summary>
-        ///     Code for build query for select one Entity from Database
+        ///     Code for build query for select one Entity from Database. This method assume that
+        ///     parameters in whereClause are placed without processing in Raw SQL. Therefore this
+        ///     is an Unsafe method, safe version is a BuildSelectOneCommandQueryAndParams.
         /// </summary>
         /// <param name="whereClause"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        // TODO(UMV) : whereClause should be modified as a structure that describes a way how to compare
         string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereClause"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        void BuildSelectOneCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause = null, 
+            IList<string> columns = null);
 
         /// <summary>
         ///     Code for build query for insert one Entity to Database

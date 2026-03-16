@@ -1,0 +1,148 @@
+using System.Data.Common;
+using Wissance.nOrm.Entity.Config;
+using Wissance.nOrm.Sql;
+
+namespace Wissance.nOrm.Entity.QueryBuilders
+{
+    /// <summary>
+    ///     This is an abstract class partially implementing  IDbEntityQueryBuilder. All BuildSelect... methods
+    ///     using only one table defined in EntityConfig.Table
+    /// </summary>
+    /// <typeparam name="TE"></typeparam>
+    public abstract class SingleTableSqlQueryBuilder<TE> : IDbEntityQueryBuilder<TE>
+        where TE : class
+    {
+        public SingleTableSqlQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler)
+        {
+            _config = config;
+            _commandParametersHandler = commandParametersHandler;
+        }
+
+        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        {
+            string columnsList = string.Join(", ", _config.FullColumnList);
+            if (columns != null && columns.Any())
+            {
+                columnsList = string.Join(", ", columns);
+            }
+
+            string whereStatement = String.Empty;
+            /*if (whereClause != null && whereClause.Any())
+            {
+                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}"));
+            }*/
+
+            string limitStatement = String.Empty;
+            if (page.HasValue && size.HasValue)
+            {
+                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
+                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
+            }
+
+            // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
+            // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
+            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, GetTableNameWithScheme(), whereStatement, limitStatement);
+            return query;
+        }
+
+        public void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, IList<WhereParameter> whereClause = null,
+            IList<string> columns = null)
+        {
+            string columnsList = string.Join(", ", _config.FullColumnList);
+            if (columns != null && columns.Any())
+            {
+                columnsList = string.Join(", ", columns);
+            }
+            
+            string limitStatement = String.Empty;
+            if (page.HasValue && size.HasValue)
+            {
+                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
+                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
+            }
+
+            string wherePreparedStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause ?? new List<WhereParameter>());
+            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, 
+                GetTableNameWithScheme(), wherePreparedStatement, limitStatement);
+            command.CommandText = query;
+            _commandParametersHandler(command, whereClause);
+        }
+
+        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        {
+            string columnsList = string.Join(", ", _config.FullColumnList);
+            if (columns != null && columns.Any())
+            {
+                columnsList = string.Join(", ", columns);
+            }
+            
+            string whereStatement = String.Empty;
+            if (whereClause != null && whereClause.Any())
+            {
+                whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
+            }
+            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
+            return query;
+        }
+
+        public void BuildSelectOneCommandQueryAndParams(DbCommand command, IList<WhereParameter> whereClause = null, 
+            IList<string> columns = null)
+        {
+            string columnsList = string.Join(", ", _config.FullColumnList);
+            if (columns != null && columns.Any())
+            {
+                columnsList = string.Join(", ", columns);
+            }
+
+            string wherePreparedStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause ?? new List<WhereParameter>());
+            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), wherePreparedStatement);
+            command.CommandText = query;
+            _commandParametersHandler(command, whereClause);
+        }
+
+        public string BuildInsertSqlQuery(TE entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string BuildBulkInsertSqlQuery(IList<TE> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string BuildUpdateSqlQuery(TE entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string GetTableSchema()
+        {
+            return _config.Schema;
+        }
+
+        public virtual string GetTableName()
+        {
+            return _config.Table;
+        }
+
+        public virtual string GetModelType()
+        {
+            return _config.Model;
+        }
+        
+        private string GetTableNameWithScheme()
+        {
+            if (string.IsNullOrEmpty(GetTableSchema()))
+                return GetTableName();
+            return $"{GetTableSchema()}.{GetTableName()}";
+        }
+
+        private readonly EntityConfig _config;
+        private readonly Action<DbCommand, IList<WhereParameter>> _commandParametersHandler;
+    }
+}

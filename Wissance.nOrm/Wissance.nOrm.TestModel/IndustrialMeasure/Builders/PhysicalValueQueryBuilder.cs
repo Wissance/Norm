@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
 using Wissance.nOrm.Sql;
@@ -7,9 +8,10 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
 {
     public class PhysicalValueQueryBuilder : IDbEntityQueryBuilder<PhysicalValueEntity>
     {
-        public PhysicalValueQueryBuilder(string schema = "")
+        public PhysicalValueQueryBuilder(Action<DbCommand, IList<WhereParameter>> commandParametersHandler , string schema = "")
         {
             _schema = schema;
+            _commandParametersHandler = commandParametersHandler;
         }
 
         public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, 
@@ -39,6 +41,29 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, 
                                          GetTableNameWithScheme(), whereStatement, limitStatement);
             return query;
+        }
+
+        public void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size, 
+                                                         IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        {
+            string columnsList = string.Join(", ", FullColumnsList);
+            if (columns != null && columns.Any())
+            {
+                columnsList = string.Join(", ", columns);
+            }
+            
+            string limitStatement = String.Empty;
+            if (page.HasValue && size.HasValue)
+            {
+                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
+                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
+            }
+
+            string wherePreparedStatement = StatementsGenerator.BuildWherePreparedStatement(whereClause ?? new List<WhereParameter>());
+            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, 
+                GetTableNameWithScheme(), wherePreparedStatement, limitStatement);
+            command.CommandText = query;
+            _commandParametersHandler(command, whereClause);
         }
 
         public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
@@ -134,5 +159,6 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
         public static IList<string> FullColumnsList = new List<string>(){"id", "name", "designation", "description"};
 
         private readonly string _schema;
+        private readonly Action<DbCommand, IList<WhereParameter>> _commandParametersHandler;
     }
 }

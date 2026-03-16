@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text;
 using Wissance.nOrm.Entity.QueryBuilders;
 using Wissance.nOrm.Sql;
@@ -36,6 +37,12 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
             string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, GetTableNameWithScheme(), whereStatement, limitStatement);
             return query;
+        }
+
+        public void BuildSelectManyCommandQueryAndParams(DbCommand command, int? page, int? size,
+            IList<WhereParameter> whereClause = null, IList<string> columns = null)
+        {
+            
         }
 
         public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)

@@ -42,5 +42,7 @@ namespace Wissance.nOrm.Tests.Sql
             string actualStatement = StatementsGenerator.BuildWhereStatement(parameters);
             Assert.Equal(expectedStatement, actualStatement);
         }
+        
+        //todo(UMV): add PreparedStatement tests
     }
 }
