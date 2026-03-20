@@ -4,7 +4,7 @@ using Wissance.nOrm.Database.Parameter;
 
 namespace Wissance.nOrm.Sqlite.Parameter
 {
-    internal class SqLiteParameterBuilder : IParameterBuilder
+    public class SqLiteParameterBuilder : IParameterBuilder
     {
         public DbParameter Build(string name, object value)
         {

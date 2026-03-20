@@ -1,10 +1,13 @@
 using DbTools.Core;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
+using Wissance.nOrm.Database.Parameter;
 using Wissance.nOrm.Entity.Config;
 using Wissance.nOrm.Repository;
 using Wissance.nOrm.Settings;
 using Wissance.nOrm.Sql;
+using Wissance.nOrm.SqlServer.Parameter;
 using Wissance.nOrm.SqlServer.Repository;
 using Wissance.nOrm.SqlServer.Tests.Builders;
 using Wissance.nOrm.SqlServer.Tests.TestData.Expected;
@@ -46,7 +49,8 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithFullColumnListAsync(int? page, int? size, int expectedSize)
         {
             IDbRepository<PhysicalValueEntity> repo = new SqlServerBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters,
+                    _parameterBuilder.Build), PhysicalValueFactory.Create, new LoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, null, null);
             Assert.NotNull(actual);
             IList<PhysicalValueEntity> expected = ExpectedPhysicalValues.Values;
@@ -64,7 +68,8 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         public async Task TestGetManyPhysicalValuesWithIdFilerAsync(int lowerIdValue, int upperIdValue, int page, int size)
         {
             IDbRepository<PhysicalValueEntity> repo = new SqlServerBufferedRepository<PhysicalValueEntity>(ConnectionString,
-                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters), PhysicalValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new PhysicalValueSqlServerSpecificQueryBuilder(_physicalValueConfig, DbCommandUtils.PassDbParameters,
+                    _parameterBuilder.Build), PhysicalValueFactory.Create, new LoggerFactory());
             IList<PhysicalValueEntity> actual = await repo.GetManyAsync(page, size, new List<WhereParameter>()
             {
                 new WhereParameter("id", null, false, WhereComparison.Greater, 
@@ -87,5 +92,6 @@ namespace Wissance.nOrm.SqlServer.Tests.Repository
         
         private readonly DbRepositorySettings _dbRepositorySettings;
         private readonly EntityConfig _physicalValueConfig;
+        private readonly IParameterBuilder _parameterBuilder = new SqlServerParameterBuilder();
     }
 }

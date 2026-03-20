@@ -9,8 +9,9 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
 {
     public class PhysicalValueSqlServerSpecificQueryBuilder : SingleTableSqlQueryBuilder<PhysicalValueEntity>
     {
-        public PhysicalValueSqlServerSpecificQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler)
-            :base(config, commandParametersHandler)
+        public PhysicalValueSqlServerSpecificQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler,
+            Func<string, object, DbParameter> parameterBuilderFunc)
+            :base(config, commandParametersHandler, parameterBuilderFunc)
         {
             _config = config;
             _commandParametersHandler = commandParametersHandler;
@@ -81,6 +82,24 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             string idValue = hasIdColumn ? $"{entity.Id}," : "";
             return string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, idValue, entity.Name, entity.Description, entity.Designation);
         }
+        
+        public override void BuildInsertCommandQueryAndParams(DbCommand command, PhysicalValueEntity entity)
+        {
+            // command.Parameters.Add()
+            bool hasIdColumn = entity.Id > 0;
+            string queryTemplate = "INSERT INTO {0} ({1} name, description, designation) VALUES({2} {3}, {4}, {5});";
+            string idColumn = hasIdColumn ? "id," : "";
+            string query = hasIdColumn
+                ? string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, "@p1,", "@p2", "@p3", "@p4")
+                : string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, "", "@p1", "@p2", "@p3");
+            command.CommandText = query;
+            if (hasIdColumn)
+                command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Id));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p2" : "@p1", entity.Name));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p3" : "@p2", entity.Description));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p4" : "@p3", entity.Designation));
+        }
+
 
         public override string BuildBulkInsertSqlQuery(IList<PhysicalValueEntity> entities)
         {
@@ -130,5 +149,6 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
         //private readonly string _schema;
         private readonly EntityConfig _config;
         private readonly Action<DbCommand, IList<WhereParameter>> _commandParametersHandler;
+        private readonly Func<string, object, DbParameter> _parameterBuilderFunc;
     }
 }
