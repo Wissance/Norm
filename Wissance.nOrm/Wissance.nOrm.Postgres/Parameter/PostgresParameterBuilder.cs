@@ -4,7 +4,7 @@ using Wissance.nOrm.Database.Parameter;
 
 namespace Wissance.nOrm.Postgres.Parameter
 {
-    internal class PostgresParameterBuilder : IParameterBuilder
+    public class PostgresParameterBuilder : IParameterBuilder
     {
         public DbParameter Build(string name, object value)
         {
