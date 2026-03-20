@@ -2,7 +2,9 @@ using System.Diagnostics;
 using DbTools.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wissance.nOrm.Common.Tests;
+using Wissance.nOrm.Database.Parameter;
 using Wissance.nOrm.Entity.Config;
+using Wissance.nOrm.MySql.Parameter;
 using Wissance.nOrm.MySql.Repository;
 using Wissance.nOrm.MySql.Utils;
 using Wissance.nOrm.Repository;
@@ -47,7 +49,8 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         public async Task PerfTestBulkInsertParametersValuesImmediately(int numberOfSamples)
         {
             IDbRepository<ParameterValueEntity> repo = new MySqlBufferedRepository<ParameterValueEntity>(ConnectionString,
-                _dbRepositorySettings, new ParameterValueQueryBuilder(_config, DbCommandUtils.PassDbParameters), ParameterValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new ParameterValueQueryBuilder(_config, DbCommandUtils.PassDbParameters, _parameterBuilder.Build), 
+                ParameterValueFactory.Create, new NullLoggerFactory());
             IList<ParameterValueEntity> values = new List<ParameterValueEntity>();
             DateTimeOffset time = DateTimeOffset.Now.AddMonths(-3);
             Random rnd = new Random((int)DateTime.Now.Ticks);
@@ -82,7 +85,8 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         public async Task PerfTestReadManyParametersValues(int numberOfSamples, int? selectingPage, int? selectingPageSize)
         {
             IDbRepository<ParameterValueEntity> repo = new MySqlBufferedRepository<ParameterValueEntity>(ConnectionString,
-                _dbRepositorySettings, new ParameterValueQueryBuilder(_config, DbCommandUtils.PassDbParameters), ParameterValueFactory.Create, new NullLoggerFactory());
+                _dbRepositorySettings, new ParameterValueQueryBuilder(_config, DbCommandUtils.PassDbParameters, _parameterBuilder.Build), 
+                ParameterValueFactory.Create, new NullLoggerFactory());
             IList<ParameterValueEntity> values = new List<ParameterValueEntity>();
             DateTimeOffset time = DateTimeOffset.Now.AddMonths(-3);
             Random rnd = new Random((int)DateTime.Now.Ticks);
@@ -119,5 +123,6 @@ namespace Wissance.nOrm.MySql.Tests.Perf
         private readonly ITestOutputHelper _outputCollector;
         private readonly DbRepositorySettings _dbRepositorySettings;
         private readonly EntityConfig _config;
+        private readonly IParameterBuilder _parameterBuilder = new MySqlParameterBuilder();
     }
 }

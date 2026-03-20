@@ -18,5 +18,10 @@ namespace Wissance.nOrm.SqlServer.Command
                 Connection = conn as SqlConnection
             };
         }
+        
+        public DbCommand BuildCommand()
+        {
+            return new SqlCommand();
+        }
     }
 }

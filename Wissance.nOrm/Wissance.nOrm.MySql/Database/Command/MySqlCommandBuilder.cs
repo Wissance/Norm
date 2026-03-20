@@ -18,5 +18,10 @@ namespace Wissance.nOrm.MySql.Database.Command
                 Connection = conn as MySqlConnection
             };
         }
+        
+        public DbCommand BuildCommand()
+        {
+            return new MySqlCommand();
+        }
     }
 }

@@ -18,5 +18,10 @@ namespace Wissance.nOrm.Postgres.Command
                 Connection = conn as NpgsqlConnection
             };
         }
+        
+        public DbCommand BuildCommand()
+        {
+            return new NpgsqlCommand();
+        }
     }
 }

@@ -66,10 +66,17 @@ namespace Wissance.nOrm.Entity.QueryBuilders
             IList<string> columns = null);
 
         /// <summary>
-        ///     Code for build query for insert one Entity to Database
+        ///     Code for build query for insert one Entity to Database. Unsafe method because it is using direct
+        ///     placing properties values into placeholders
         /// </summary>
         /// <returns></returns>
         string BuildInsertSqlQuery(TE entity);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        void BuildInsertCommandQueryAndParams(DbCommand command, TE entity);
         
         /// <summary>
         ///     Code for build query for insert multiple Entities to Database

@@ -12,10 +12,12 @@ namespace Wissance.nOrm.Entity.QueryBuilders
     public abstract class SingleTableSqlQueryBuilder<TE> : IDbEntityQueryBuilder<TE>
         where TE : class
     {
-        public SingleTableSqlQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler)
+        public SingleTableSqlQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler,
+            Func<string, object, DbParameter> parameterBuilderFunc)
         {
             _config = config;
             _commandParametersHandler = commandParametersHandler;
+            _parameterBuilderFunc = parameterBuilderFunc;
         }
 
         public virtual string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null)
@@ -101,6 +103,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         }
 
         public abstract string BuildInsertSqlQuery(TE entity);
+        public abstract void BuildInsertCommandQueryAndParams(DbCommand command, TE entity);
         public abstract string BuildBulkInsertSqlQuery(IList<TE> entities);
 
         public abstract string BuildUpdateSqlQuery(TE entity);
@@ -142,5 +145,6 @@ namespace Wissance.nOrm.Entity.QueryBuilders
 
         private readonly EntityConfig _config;
         private readonly Action<DbCommand, IList<WhereParameter>> _commandParametersHandler;
+        private readonly Func<string, object, DbParameter> _parameterBuilderFunc;
     }
 }

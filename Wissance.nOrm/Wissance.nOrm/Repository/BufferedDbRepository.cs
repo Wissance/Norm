@@ -176,8 +176,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    insertQuery = _sqlBuilder.BuildInsertSqlQuery(item);
-                    int result = await UpsertImpl(insertQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildInsertCommandQueryAndParams(cmd, item);
+                    int result = await UpsertImpl(cmd);
                     return result > 0;
                 }
                 
@@ -381,6 +382,54 @@ namespace Wissance.nOrm.Repository
             catch (Exception e)
             {
                 _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return -2;
+            }
+        }
+        
+        /// <summary>
+        ///     This function executing already prepared command
+        /// </summary>
+        /// <param name="upsertCommand"></param>
+        /// <returns></returns>
+        private async Task<int> UpsertImpl(DbCommand upsertCommand)
+        {
+            int result = 0;
+            try
+            {
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+                {
+                    DbTransaction transaction = null;
+                    try
+                    {
+                        await conn.OpenAsync(_cancellationSource.Token);
+                        transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
+                        upsertCommand.Connection = conn;
+                        upsertCommand.CommandTimeout = _settings.CommandTimeout;
+
+                        using (upsertCommand)
+                        {
+                            result = await upsertCommand.ExecuteNonQueryAsync(_cancellationSource.Token);
+                        }
+
+                        await transaction.CommitAsync(_cancellationSource.Token);
+                        await conn.CloseAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertCommand.CommandText}\", error: ${e.Message}");
+                        _logger.LogDebug(e.ToString());
+                        result = -1;
+                        if (transaction != null)
+                            await transaction.RollbackAsync(_cancellationSource.Token);
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertCommand.CommandText}\", error: ${e.Message}");
                 _logger.LogDebug(e.ToString());
                 return -2;
             }
