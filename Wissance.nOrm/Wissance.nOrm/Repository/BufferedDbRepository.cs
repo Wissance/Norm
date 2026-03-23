@@ -244,8 +244,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    updateQuery = _sqlBuilder.BuildUpdateSqlQuery(item);
-                    int result = await UpsertImpl(updateQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildUpdateCommandQueryAndParams(cmd, item);
+                    int result = await UpsertImpl(cmd);
                     return result > 0;
                 }
                 

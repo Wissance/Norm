@@ -135,6 +135,17 @@ namespace Wissance.nOrm.SqlServer.Tests.Builders
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
         }
         
+        public override void BuildUpdateCommandQueryAndParams(DbCommand command, PhysicalValueEntity entity)
+        {
+            string queryTemplate = "UPDATE {0} SET name={1}, description={2}, designation={3} WHERE id={4};";
+            string query = string.Format(queryTemplate, GetTableNameWithScheme(), "@p1", "@p2", "@p3", "@p4");
+            command.CommandText = query;
+            command.Parameters.Add(_parameterBuilderFunc("@p4", entity.Id));
+            command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Name));
+            command.Parameters.Add(_parameterBuilderFunc("@p2", entity.Description));
+            command.Parameters.Add(_parameterBuilderFunc("@p3", entity.Designation));
+        }
+        
         /*public string BuildDeleteQuery(IList<WhereParameter> whereClause)
         {
             string whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);

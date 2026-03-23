@@ -75,7 +75,17 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
         {
             throw new NotImplementedException();
         }
+        
+        public override void BuildUpdateCommandQueryAndParams(DbCommand command, ParameterValueEntity entity)
+        {
+            string queryTemplate = "UPDATE {0} SET time={1}, value={2} WHERE id={3};";
+            string query = string.Format(queryTemplate, GetTableNameWithScheme(), "@p1", "@p2", "@p3");
+            command.CommandText = query;
+            command.Parameters.Add(_parameterBuilderFunc("@p3", entity.Id));
+            command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Time));
+            command.Parameters.Add(_parameterBuilderFunc("@p2", entity.Value));
+        }
 
-        private Func<string, object, DbParameter> _parameterBuilderFunc;
+        private readonly Func<string, object, DbParameter> _parameterBuilderFunc;
     }
 }

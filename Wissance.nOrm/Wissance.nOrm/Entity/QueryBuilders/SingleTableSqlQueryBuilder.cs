@@ -105,7 +105,7 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         public abstract string BuildInsertSqlQuery(TE entity);
         public abstract void BuildInsertCommandQueryAndParams(DbCommand command, TE entity);
         public abstract string BuildBulkInsertSqlQuery(IList<TE> entities);
-
+        public abstract void BuildUpdateCommandQueryAndParams(DbCommand command, TE entity);
         public abstract string BuildUpdateSqlQuery(TE entity);
 
         public virtual string BuildDeleteQuery(IList<WhereParameter> whereClause)

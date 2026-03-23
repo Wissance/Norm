@@ -96,10 +96,18 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         string BuildBulkInsertSqlQuery(IList<TE> entities);
         
         /// <summary>
-        ///     Code for build query for update Entity in Database
+        ///     Code for build query for update Entity in Database. Unsafe method (due to it vulnerable to SQL injection) because it is
+        ///     using direct placing properties values into placeholders
         /// </summary>
         /// <returns></returns>
         string BuildUpdateSqlQuery(TE entity);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="entity"></param>
+        void BuildUpdateCommandQueryAndParams(DbCommand command, TE entity);
         
         /// <summary>
         ///     Code for build query for delete Entities from Database. This is an Unsafe method because
