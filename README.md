@@ -1,6 +1,6 @@
 # Norm
 
-Ultra fast multi threads/tasks .Net Database framework.
+Ultra fast safe (SQL Injection protected) multi threads/tasks .Net Database framework.
 
 ![Norm logo](img/logo/ai_3_sm.jpg)
 
@@ -10,17 +10,18 @@ Ultra fast multi threads/tasks .Net Database framework.
 
 1. No object tracking
 2. No Lazy loading properties
+3. No Reflection usage
 
 But it gives us the following:
-1. Read spead is fast (**10000 rows select from 100000 rows Mysql database ~100-200 ms**)
+1. Read spead is ultra fast (**500000 rows select from 1000000 rows in non-tuned (default) Mysql database ~10 ms**)
 
 | Table size (rows)  | Rows to select   | Time, ms |
 | ------------------ | ---------------- | -------- |
-| 100k               | 10k              | 154      |
-| 100k               | 10k in a middle  | 190      |
-| 100k               | 100k             | 1114     |
-| 1M                 | 100k             | 1135     |
-| 1M                 | 500k             | 5624     |
+| 100k               | 10k              | 5        |
+| 100k               | 10k in a middle  | 5        |
+| 1M                 | 20k              | 7        |
+| 1M                 | 100k             | 8        |
+| 1M                 | 500k             | 9        |
 
 2. Insert speed is fast (**10000 rows ~ 600 ms**, **100000 rows ~ 3000-5000 ms** on `i5` CPU for `MySql 8.0.23` with **default** settings)
 
