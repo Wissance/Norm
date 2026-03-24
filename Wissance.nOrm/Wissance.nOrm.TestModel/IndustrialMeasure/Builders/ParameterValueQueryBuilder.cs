@@ -42,6 +42,39 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p4" : "@p3", entity.Value));
         }
 
+        public override void BuildBulkInsertCommandQueryAndParams(DbCommand command, IList<ParameterValueEntity> entities)
+        {
+            bool hasIdColumn = entities[0].Id > 0;
+            string columns = "parameter_id, time, value";
+            if (hasIdColumn)
+                columns = $"id, {columns}";
+            StringBuilder queryBuilder = new StringBuilder($"INSERT INTO {GetTableNameWithScheme()} ({columns}) VALUES");
+            bool appendComma = false;
+            int objCounter = 1;
+            foreach (ParameterValueEntity entity in entities)
+            {
+                if (appendComma)
+                    queryBuilder.Append(",\n");
+
+                queryBuilder.Append("(");
+                string values = hasIdColumn 
+                    ? $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3, @p{objCounter}4" 
+                    : $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3";
+                if (hasIdColumn)
+                    command.Parameters.Add(_parameterBuilderFunc("@p{objCounter}1", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}2" : $"@p{objCounter}1", entity.ParameterId));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}3" : $"@p{objCounter}2", entity.Time));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}4" : $"@p{objCounter}3", entity.Value));
+                
+                queryBuilder.Append(values);
+                queryBuilder.Append(")");
+                appendComma = true;
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
+        }
+
         public override string BuildBulkInsertSqlQuery(IList<ParameterValueEntity> entities)
         {
             bool hasIdColumn = entities[0].Id > 0;
@@ -84,6 +117,25 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             command.Parameters.Add(_parameterBuilderFunc("@p3", entity.Id));
             command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Time));
             command.Parameters.Add(_parameterBuilderFunc("@p2", entity.Value));
+        }
+        
+        public override void BuildBulkUpdateCommandQueryAndParams(DbCommand command, IList<ParameterValueEntity> entities)
+        {
+            StringBuilder queryBuilder = new StringBuilder();
+            string queryTemplate = "UPDATE {0} SET time={1}, value={2} WHERE id={3};";
+            int objCounter = 1;
+            foreach (ParameterValueEntity entity in entities)
+            {
+                queryBuilder.Append(string.Format(queryTemplate, GetTableNameWithScheme(), $"@p{objCounter}1",
+                    $"@p{objCounter}2", $"@p{objCounter}3"));
+                
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}3", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}1", entity.Time));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}2", entity.Value));
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
         }
 
         private readonly Func<string, object, DbParameter> _parameterBuilderFunc;

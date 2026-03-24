@@ -71,6 +71,39 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             return queryBuilder.ToString();
         }
 
+        public override void BuildBulkInsertCommandQueryAndParams(DbCommand command, IList<PhysicalValueEntity> entities)
+        {
+            bool hasIdColumn = entities[0].Id > 0;
+            string columns = "name, description, designation";
+            if (hasIdColumn)
+                columns = $"id, {columns}";
+            StringBuilder queryBuilder = new StringBuilder($"INSERT INTO {GetTableNameWithScheme()} ({columns}) VALUES");
+            bool appendComma = false;
+            int objCounter = 1;
+            foreach (PhysicalValueEntity entity in entities)
+            {
+                if (appendComma)
+                    queryBuilder.Append(",\n");
+
+                queryBuilder.Append("(");
+                string values = hasIdColumn 
+                              ? $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3, @p{objCounter}4" 
+                              : $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3";
+                if (hasIdColumn)
+                    command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}1", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}2" : $"@p{objCounter}1", entity.Name));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}3" : $"@p{objCounter}2", entity.Description));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}4" : $"@p{objCounter}3", entity.Designation));
+                
+                queryBuilder.Append(values);
+                queryBuilder.Append(")");
+                appendComma = true;
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
+        }
+
         public override string BuildUpdateSqlQuery(PhysicalValueEntity entity)
         {
             return $"UPDATE {GetTableNameWithScheme()} SET name='{entity.Name}', description='{entity.Description}', designation='{entity.Designation}' WHERE id={entity.Id};";
@@ -85,6 +118,26 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Name));
             command.Parameters.Add(_parameterBuilderFunc("@p2", entity.Description));
             command.Parameters.Add(_parameterBuilderFunc("@p3", entity.Designation));
+        }
+        
+        public override void BuildBulkUpdateCommandQueryAndParams(DbCommand command, IList<PhysicalValueEntity> entities)
+        {
+            StringBuilder queryBuilder = new StringBuilder();
+            string queryTemplate = "UPDATE {0} SET name={1}, description={2}, designation={3} WHERE id={4};";
+            int objCounter = 1;
+            foreach (PhysicalValueEntity entity in entities)
+            {
+                queryBuilder.Append(string.Format(queryTemplate, GetTableNameWithScheme(), $"@p{objCounter}1",
+                    $"@p{objCounter}2", $"@p{objCounter}3", $"@p{objCounter}4"));
+                
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}4", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}1", entity.Name));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}2", entity.Description));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}3", entity.Designation));
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
         }
         
         private readonly Func<string, object, DbParameter> _parameterBuilderFunc;

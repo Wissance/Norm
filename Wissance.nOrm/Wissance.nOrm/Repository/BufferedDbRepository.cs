@@ -211,9 +211,10 @@ namespace Wissance.nOrm.Repository
                     return 0;
                 if (immediately)
                 {
-                    bulkInsertQuery = _sqlBuilder.BuildBulkInsertSqlQuery(items);
-
-                    int result = await UpsertImpl(bulkInsertQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildBulkInsertCommandQueryAndParams(cmd, items);
+                    bulkInsertQuery = cmd.CommandText;
+                    int result = await UpsertImpl(cmd);
                     return result;
                 }
 
@@ -277,12 +278,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    foreach (T item in items)
-                    {
-                        bulkUpdateQueryBuilder.Append(_sqlBuilder.BuildUpdateSqlQuery(item));
-                    }
-                    
-                    int result = await UpsertImpl(bulkUpdateQueryBuilder.ToString());
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildBulkUpdateCommandQueryAndParams(cmd, items);
+                    int result = await UpsertImpl(cmd);
                     return result;
                 }
                 

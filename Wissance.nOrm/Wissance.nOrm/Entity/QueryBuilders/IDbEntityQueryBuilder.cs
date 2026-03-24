@@ -92,14 +92,23 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <summary>
         ///     Code for build query for insert multiple Entities to Database
         /// </summary>
-        /// <returns></returns>
+        /// <returns>SQL with Bukl insert statement</returns>
+        [Obsolete("This func is obsolete due to it unsafe and vulnerable to SQL-Injection. Use BuildBulkInsertCommandQueryAndParams instead.", false)]
         string BuildBulkInsertSqlQuery(IList<TE> entities);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="entities"></param>
+        void BuildBulkInsertCommandQueryAndParams(DbCommand command, IList<TE> entities);
         
         /// <summary>
         ///     Code for build query for update Entity in Database. Unsafe method (due to it vulnerable to SQL injection) because it is
         ///     using direct placing properties values into placeholders
         /// </summary>
-        /// <returns></returns>
+        /// <returns>SQL with update statement</returns>
+        [Obsolete("This func is obsolete due to it unsafe and vulnerable to SQL-Injection. Use BuildUpdateCommandQueryAndParams instead.", false)]
         string BuildUpdateSqlQuery(TE entity);
         
         /// <summary>
@@ -108,6 +117,13 @@ namespace Wissance.nOrm.Entity.QueryBuilders
         /// <param name="command"></param>
         /// <param name="entity"></param>
         void BuildUpdateCommandQueryAndParams(DbCommand command, TE entity);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="entities"></param>
+        void BuildBulkUpdateCommandQueryAndParams(DbCommand command, IList<TE> entities);
         
         /// <summary>
         ///     Code for build query for delete Entities from Database. This is an Unsafe method because
