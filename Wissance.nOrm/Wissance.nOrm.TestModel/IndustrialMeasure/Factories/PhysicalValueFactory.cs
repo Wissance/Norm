@@ -6,6 +6,7 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Factories
     {
         public static PhysicalValueEntity Create(IList<object> columnsValues, IList<string> columns)
         {
+            
             PhysicalValueEntity entity = new PhysicalValueEntity();
             // consider FULL column list
             // todo(UMV) : assign only props from columns
