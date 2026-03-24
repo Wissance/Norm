@@ -3,13 +3,14 @@ using Wissance.nOrm.Database.Command;
 using Wissance.nOrm.Database.Connection;
 using Wissance.nOrm.Postgres.Command;
 using Wissance.nOrm.Postgres.Connection;
+using Wissance.nOrm.Postgres.Parameter;
 
 namespace Wissance.nOrm.Postgres
 {
     public class PostgresAdapter : DbAdapter
     {
         public PostgresAdapter() 
-            : base(new PostgresConnectionBuilder(), new PostgresCommandBuilder())
+            : base(new PostgresConnectionBuilder(), new PostgresCommandBuilder(), new PostgresParameterBuilder())
         {
         }
     }

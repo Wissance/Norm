@@ -34,26 +34,51 @@ namespace Wissance.nOrm.Sql
                 string fullComparison = String.Format(template, values);
                 sb.Append(fullComparison);
             }
-           
+            if (sb.Length > 0)
+            {
+                sb.Insert(0, "WHERE ");
+            }
             return sb.ToString();
         }
 
-        /*public static string GenerateSelectSql(IList<string> columns, string schema, string table,  IList<WhereParameter> parameters)
+        public static string BuildWherePreparedStatement(IList<WhereParameter> parameters)
         {
             StringBuilder sb = new StringBuilder();
+            int paramCounter = 1;
+            foreach (WhereParameter parameter in parameters)
+            {
+                if (parameter.JoinCondition != null)
+                {
+                    sb.Append($" {JoinStatements[parameter.JoinCondition.Value]} ");
+                }
 
-            // ...
-            
-            // ...
+                sb.Append($"{ parameter.Column }");
+                if (parameter.Inverted)
+                {
+                    sb.Append(" NOT ");
+                }
+                
+                string template = FilterStatementsTemplates[parameter.ComparisonOperator];
+                string value = "";
+                if (parameter.ComparisonOperator == WhereComparison.Between)
+                {
+                    value = string.Format(template, $"@p{paramCounter} AND @p{++paramCounter}");
+                }
+                else
+                {
+                    value = string.Format(template, $"@p{paramCounter}");
+                }
+
+                sb.Append(value);
+                paramCounter++;
+            }
+
+            if (sb.Length > 0)
+            {
+                sb.Insert(0, "WHERE ");
+            }
             return sb.ToString();
-        }*/
-        
-        public const string SelectAllColumns = "*";
-        private const string SelectTemplate = "SELECT {0} FROM {1} ";
-        private const string JoinStatement = "{0} JOIN {} ON ";
-        private const string WhereStatement = " WHERE ";
-        private const string OrderByTemplate = " ORDER BY {0} {1}";
-        private const string GroupByTemplate = " GROUP BY {0}";
+        }
 
         private static readonly IDictionary<WhereJoinCondition, string> JoinStatements = new Dictionary<WhereJoinCondition, string>()
         {

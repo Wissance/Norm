@@ -26,7 +26,7 @@ namespace Wissance.nOrm.Sql
         In,
         Between
     }
-
+    
     // TODO(umv): make comparisonOperator enum
     // todo(UMV): temporarily not export until https://github.com/Wissance/Norm/issues/2 is solved
     public class WhereParameter

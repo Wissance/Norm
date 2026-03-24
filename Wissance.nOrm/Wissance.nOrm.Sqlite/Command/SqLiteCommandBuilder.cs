@@ -10,5 +10,18 @@ namespace Wissance.nOrm.Sqlite.Command
         {
             return new SQLiteCommand(sqlCmd, conn as SQLiteConnection);
         }
+
+        public DbCommand BuildCommand(DbConnection conn)
+        {
+            return new SQLiteCommand()
+            {
+                Connection = conn as SQLiteConnection
+            };
+        }
+        
+        public DbCommand BuildCommand()
+        {
+            return new SQLiteCommand();
+        }
     }
 }

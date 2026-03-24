@@ -1,61 +1,22 @@
+using System.Data.Common;
 using System.Text;
+using Wissance.nOrm.Entity.Config;
 using Wissance.nOrm.Entity.QueryBuilders;
 using Wissance.nOrm.Sql;
 using Wissance.nOrm.TestModel.IndustrialMeasure.Entity;
 
 namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
 {
-    public class ParameterValueQueryBuilder : IDbEntityQueryBuilder<ParameterValueEntity>
+    public class ParameterValueQueryBuilder : SingleTableSqlQueryBuilder<ParameterValueEntity>
     {
-        public ParameterValueQueryBuilder(string schema = "")
+        public ParameterValueQueryBuilder(EntityConfig config, Action<DbCommand, IList<WhereParameter>> commandParametersHandler,
+            Func<string, object, DbParameter> parameterBuilderFunc)
+            :base(config, commandParametersHandler, parameterBuilderFunc)
         {
-            _schema = schema;
-        }
-        public string BuildSelectManyQuery(int? page, int? size, IList<WhereParameter> whereClause = null, IList<string> columns = null)
-        {
-            string columnsList = string.Join(", ", FullColumnsList);
-            if (columns != null && columns.Any())
-            {
-                columnsList = string.Join(", ", columns);
-            }
-
-            string whereStatement = String.Empty;
-            /*if (whereClause != null && whereClause.Any())
-            {
-                whereStatement = string.Join(", ", whereClause.Select(kv => $"{kv.Key}"));
-            }*/
-
-            string limitStatement = String.Empty;
-            if (page.HasValue && size.HasValue)
-            {
-                int offsetValue = page.Value > 0 ? (page.Value - 1) * size.Value : 0;
-                limitStatement = $" LIMIT {size.Value} OFFSET {offsetValue}";
-            }
-
-            // Consider that in MySQL we don't use Schema in Pg or SQL Server we use Schema.TableName
-            // Here is a scheme for query : 0 -> column list, 1 -> Table name 2 -> WHERE Clause
-            string query = String.Format("SELECT {0} FROM {1} {2} {3}", columnsList, GetTableNameWithScheme(), whereStatement, limitStatement);
-            return query;
+            _parameterBuilderFunc = parameterBuilderFunc;
         }
 
-        public string BuildSelectOneQuery(IList<WhereParameter> whereClause = null, IList<string> columns = null)
-        {
-            string columnsList = string.Join(", ", FullColumnsList);
-            if (columns != null && columns.Any())
-            {
-                columnsList = string.Join(", ", columns);
-            }
-            
-            string whereStatement = String.Empty;
-            if (whereClause != null && whereClause.Any())
-            {
-                whereStatement = StatementsGenerator.BuildWhereStatement(whereClause);
-            }
-            string query = String.Format("SELECT {0} FROM {1} {2} LIMIT 1", columnsList, GetTableNameWithScheme(), whereStatement);
-            return query;
-        }
-
-        public string BuildInsertSqlQuery(ParameterValueEntity entity)
+        public override string BuildInsertSqlQuery(ParameterValueEntity entity)
         {
             bool hasIdColumn = entity.Id > 0;
             string queryTemplate = "INSERT INTO {0} ({1} parameter_id, time, value) VALUES({2} {3}, '{4}', '{5}');";
@@ -65,7 +26,56 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
                 entity.Time.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"), entity.Value);
         }
 
-        public string BuildBulkInsertSqlQuery(IList<ParameterValueEntity> entities)
+        public override void BuildInsertCommandQueryAndParams(DbCommand command, ParameterValueEntity entity)
+        {
+            bool hasIdColumn = entity.Id > 0;
+            string queryTemplate = "INSERT INTO {0} ({1} parameter_id, time, value) VALUES({2} {3}, {4}, {5});";
+            string idColumn = hasIdColumn ? "id," : "";
+            string query = hasIdColumn
+                         ? string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, "@p1,", "@p2", "@p3", "@p4")
+                         : string.Format(queryTemplate, GetTableNameWithScheme(), idColumn, "", "@p1", "@p2", "@p3");
+            command.CommandText = query;
+            if (hasIdColumn)
+                command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Id));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p2" : "@p1", entity.ParameterId));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p3" : "@p2", entity.Time));
+            command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? "@p4" : "@p3", entity.Value));
+        }
+
+        public override void BuildBulkInsertCommandQueryAndParams(DbCommand command, IList<ParameterValueEntity> entities)
+        {
+            bool hasIdColumn = entities[0].Id > 0;
+            string columns = "parameter_id, time, value";
+            if (hasIdColumn)
+                columns = $"id, {columns}";
+            StringBuilder queryBuilder = new StringBuilder($"INSERT INTO {GetTableNameWithScheme()} ({columns}) VALUES");
+            bool appendComma = false;
+            int objCounter = 1;
+            foreach (ParameterValueEntity entity in entities)
+            {
+                if (appendComma)
+                    queryBuilder.Append(",\n");
+
+                queryBuilder.Append("(");
+                string values = hasIdColumn 
+                    ? $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3, @p{objCounter}4" 
+                    : $"@p{objCounter}1, @p{objCounter}2, @p{objCounter}3";
+                if (hasIdColumn)
+                    command.Parameters.Add(_parameterBuilderFunc("@p{objCounter}1", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}2" : $"@p{objCounter}1", entity.ParameterId));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}3" : $"@p{objCounter}2", entity.Time));
+                command.Parameters.Add(_parameterBuilderFunc(hasIdColumn ? $"@p{objCounter}4" : $"@p{objCounter}3", entity.Value));
+                
+                queryBuilder.Append(values);
+                queryBuilder.Append(")");
+                appendComma = true;
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
+        }
+
+        public override string BuildBulkInsertSqlQuery(IList<ParameterValueEntity> entities)
         {
             bool hasIdColumn = entities[0].Id > 0;
             string columns = "parameter_id, time, value";
@@ -94,42 +104,40 @@ namespace Wissance.nOrm.TestModel.IndustrialMeasure.Builders
             return queryBuilder.ToString();
         }
 
-        public string BuildUpdateSqlQuery(ParameterValueEntity entity)
+        public override string BuildUpdateSqlQuery(ParameterValueEntity entity)
         {
             throw new NotImplementedException();
         }
         
-        public string BuildDeleteQuery(IList<WhereParameter> whereClause)
+        public override void BuildUpdateCommandQueryAndParams(DbCommand command, ParameterValueEntity entity)
         {
-            throw new NotImplementedException();
+            string queryTemplate = "UPDATE {0} SET time={1}, value={2} WHERE id={3};";
+            string query = string.Format(queryTemplate, GetTableNameWithScheme(), "@p1", "@p2", "@p3");
+            command.CommandText = query;
+            command.Parameters.Add(_parameterBuilderFunc("@p3", entity.Id));
+            command.Parameters.Add(_parameterBuilderFunc("@p1", entity.Time));
+            command.Parameters.Add(_parameterBuilderFunc("@p2", entity.Value));
+        }
+        
+        public override void BuildBulkUpdateCommandQueryAndParams(DbCommand command, IList<ParameterValueEntity> entities)
+        {
+            StringBuilder queryBuilder = new StringBuilder();
+            string queryTemplate = "UPDATE {0} SET time={1}, value={2} WHERE id={3};";
+            int objCounter = 1;
+            foreach (ParameterValueEntity entity in entities)
+            {
+                queryBuilder.Append(string.Format(queryTemplate, GetTableNameWithScheme(), $"@p{objCounter}1",
+                    $"@p{objCounter}2", $"@p{objCounter}3"));
+                
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}3", entity.Id));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}1", entity.Time));
+                command.Parameters.Add(_parameterBuilderFunc($"@p{objCounter}2", entity.Value));
+                objCounter++;
+            }
+
+            command.CommandText = queryBuilder.ToString();
         }
 
-        public string GetTableSchema()
-        {
-            return _schema;
-        }
-
-        public string GetTableName()
-        {
-            return TableName;
-        }
-
-        public string GetModelType()
-        {
-            return ModelName;
-        }
-
-        private string GetTableNameWithScheme()
-        {
-            if (string.IsNullOrEmpty(GetTableSchema()))
-                return GetTableName();
-            return $"{GetTableSchema()}.{GetTableName()}";
-        }
-
-        private const string ModelName = "ParameterValue";
-        private const string TableName = "parameters_values";
-        public static IList<string> FullColumnsList = new List<string>(){"id", "parameter_id", "time", "value"};
-
-        private readonly string _schema;
+        private readonly Func<string, object, DbParameter> _parameterBuilderFunc;
     }
 }

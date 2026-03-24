@@ -6,17 +6,17 @@ namespace Wissance.nOrm.Repository
     ///   This interface describes operation over persistent Entities. Entity could be:
     ///       1. a database table
     ///       2. an aggregate a composition of tables
-    ///   1. In General we are support traditional common operations:
+    ///   1. In general, we are support traditional common operations:
     ///       1.1 Read (select) many entities with filtering
-    ///       1.2 Read (select) one entities with filtering
-    ///       1.3 Create (insert) an one entity
+    ///       1.2 Read (select) one entitiy with filtering
+    ///       1.3 Create (insert) one entity
     ///       1.4 Update (update) en existing entity
     ///       1.5 Delete (delete) an existing entity
-    ///   2. Additionally we are support bulk operations:
+    ///   2. Additionally, library are supporting bulk operations:
     ///       2.1 Create multiple (Bulk insert) entities
     ///       2.2 Update multiple (Bulk update) entities
     /// </summary>
-    /// <typeparam name="T">Entity that is ether direct mapping to table or aggregate</typeparam>
+    /// <typeparam name="T">Entity that is either direct mapping to table or aggregate</typeparam>
     public interface IDbRepository<T> : IDisposable 
         where T: class, new()
     {

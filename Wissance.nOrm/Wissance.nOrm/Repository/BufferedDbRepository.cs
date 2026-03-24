@@ -76,10 +76,10 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    sql = _sqlBuilder.BuildSelectManyQuery(page, size, whereClause, columns);
                     // 2. Create Command from Adapter
-                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(conn))
                     {
+                        _sqlBuilder.BuildSelectManyCommandQueryAndParams(cmd, page, size, whereClause, columns);
                         // 3. Execute Db Reader && read
                         DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
                         // 4. Construct item from a fieldset using a Factory method
@@ -129,10 +129,10 @@ namespace Wissance.nOrm.Repository
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
                 {
                     await conn.OpenAsync(_cancellationSource.Token);
-                    sql = _sqlBuilder.BuildSelectOneQuery(whereClause, columns);
                     // 2. Create Command from Adapter
                     using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(sql, conn))
                     {
+                        _sqlBuilder.BuildSelectOneCommandQueryAndParams(cmd, whereClause, columns);
                         // 3. Execute Db Reader && read
                         DbDataReader reader = await cmd.ExecuteReaderAsync(_cancellationSource.Token);
                         // 4. Construct item from a fieldset using a Factory method
@@ -176,8 +176,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    insertQuery = _sqlBuilder.BuildInsertSqlQuery(item);
-                    int result = await UpsertImpl(insertQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildInsertCommandQueryAndParams(cmd, item);
+                    int result = await UpsertImpl(cmd);
                     return result > 0;
                 }
                 
@@ -210,9 +211,10 @@ namespace Wissance.nOrm.Repository
                     return 0;
                 if (immediately)
                 {
-                    bulkInsertQuery = _sqlBuilder.BuildBulkInsertSqlQuery(items);
-
-                    int result = await UpsertImpl(bulkInsertQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildBulkInsertCommandQueryAndParams(cmd, items);
+                    bulkInsertQuery = cmd.CommandText;
+                    int result = await UpsertImpl(cmd);
                     return result;
                 }
 
@@ -243,8 +245,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    updateQuery = _sqlBuilder.BuildUpdateSqlQuery(item);
-                    int result = await UpsertImpl(updateQuery);
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildUpdateCommandQueryAndParams(cmd, item);
+                    int result = await UpsertImpl(cmd);
                     return result > 0;
                 }
                 
@@ -275,12 +278,9 @@ namespace Wissance.nOrm.Repository
             {
                 if (immediately)
                 {
-                    foreach (T item in items)
-                    {
-                        bulkUpdateQueryBuilder.Append(_sqlBuilder.BuildUpdateSqlQuery(item));
-                    }
-                    
-                    int result = await UpsertImpl(bulkUpdateQueryBuilder.ToString());
+                    DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand();
+                    _sqlBuilder.BuildBulkUpdateCommandQueryAndParams(cmd, items);
+                    int result = await UpsertImpl(cmd);
                     return result;
                 }
                 
@@ -305,9 +305,9 @@ namespace Wissance.nOrm.Repository
         /// <returns></returns>
         public async Task<bool> DeleteAsync(IList<WhereParameter> whereClause)
         {
-            string deleteQuery = _sqlBuilder.BuildDeleteQuery(whereClause);
             int result = -1;
             DbTransaction transaction = null;
+            string deleteQuery = "";
             try
             {
                 using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
@@ -315,8 +315,10 @@ namespace Wissance.nOrm.Repository
                     await conn.OpenAsync(_cancellationSource.Token);
                     transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
 
-                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(deleteQuery, conn))
+                    using (DbCommand cmd = _dbAdapter.CmdBuilder.BuildCommand(conn))
                     {
+                        _sqlBuilder.BuildDeleteCommandQueryAndParams(cmd, whereClause);
+                        deleteQuery = cmd.CommandText;
                         cmd.CommandTimeout = _settings.CommandTimeout;
                         result = await cmd.ExecuteNonQueryAsync();
                     }
@@ -379,6 +381,54 @@ namespace Wissance.nOrm.Repository
             catch (Exception e)
             {
                 _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertQuery}\", error: ${e.Message}");
+                _logger.LogDebug(e.ToString());
+                return -2;
+            }
+        }
+        
+        /// <summary>
+        ///     This function executing already prepared command
+        /// </summary>
+        /// <param name="upsertCommand"></param>
+        /// <returns></returns>
+        private async Task<int> UpsertImpl(DbCommand upsertCommand)
+        {
+            int result = 0;
+            try
+            {
+                using (DbConnection conn = _dbAdapter.ConnBuilder.BuildConnection(_connStr))
+                {
+                    DbTransaction transaction = null;
+                    try
+                    {
+                        await conn.OpenAsync(_cancellationSource.Token);
+                        transaction = await conn.BeginTransactionAsync(_cancellationSource.Token);
+                        upsertCommand.Connection = conn;
+                        upsertCommand.CommandTimeout = _settings.CommandTimeout;
+
+                        using (upsertCommand)
+                        {
+                            result = await upsertCommand.ExecuteNonQueryAsync(_cancellationSource.Token);
+                        }
+
+                        await transaction.CommitAsync(_cancellationSource.Token);
+                        await conn.CloseAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertCommand.CommandText}\", error: ${e.Message}");
+                        _logger.LogDebug(e.ToString());
+                        result = -1;
+                        if (transaction != null)
+                            await transaction.RollbackAsync(_cancellationSource.Token);
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"An error occurred during insert/update object of type \"{typeof(T)}\" with SQL query: \"{upsertCommand.CommandText}\", error: ${e.Message}");
                 _logger.LogDebug(e.ToString());
                 return -2;
             }
